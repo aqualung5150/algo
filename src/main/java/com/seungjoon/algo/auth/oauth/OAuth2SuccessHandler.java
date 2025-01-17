@@ -2,7 +2,6 @@ package com.seungjoon.algo.auth.oauth;
 
 import com.seungjoon.algo.auth.JwtProvider;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,19 +29,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtProvider.generateToken(userDetails.getId(), role, 10 * 60 * 1000L);
 
-        response.addCookie(createJwtCookie("access_token", token));
+        response.addCookie(jwtProvider.createJwtCookie(token));
         //TODO - originalURL
         response.sendRedirect("http://localhost:5173/");
 
-    }
-
-    private Cookie createJwtCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-//        cookie.setMaxAge(10 * 60);
-//        cookie.setSecure(true);
-
-        return cookie;
     }
 }

@@ -51,4 +51,6 @@ public class User {
     public void changeImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+    public void changeUsername(String username) { this.username = username; }
+    public void changeRole(Role role) { this.role = role; }
 }

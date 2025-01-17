@@ -17,7 +17,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User create(@Valid CreateUserRequest request) {
+    public User create(CreateUserRequest request) {
 
         return userRepository.save(
                 User.builder()

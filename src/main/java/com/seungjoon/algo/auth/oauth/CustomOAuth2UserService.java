@@ -1,5 +1,8 @@
 package com.seungjoon.algo.auth.oauth;
 
+import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
+import com.seungjoon.algo.exception.BadRequestException;
+import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.user.domain.Role;
 import com.seungjoon.algo.user.domain.User;
 import com.seungjoon.algo.user.domain.UserState;
@@ -41,7 +44,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .username(user.getUsername())
                 .password(null)
                 .name(oAuth2UserInfo.getProvider() + "_" + oAuth2UserInfo.getProviderId())
-                .role(user.getRole().toString())
+                .role(user.getRole().name())
                 .build();
 
         return new PrincipalDetails(principal);
@@ -65,5 +68,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .imageUrl(oAuth2UserInfo.getImageUrl())
                 .build()
         );
+    }
+
+    public User setUsername(Long userId, SetUsernameRequest request) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER));
+
+        user.changeUsername(request.getUsername());
+        user.changeRole(Role.MEMBER);
+
+        return user;
     }
 }

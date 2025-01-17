@@ -11,17 +11,31 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class HelloController {
 
-    @GetMapping
+    @ResponseBody
+    @GetMapping("/")
+    public String root() {
+        return "root";
+    }
+
+    @ResponseBody
+    @GetMapping("/hello")
     public String hello() {
         return "hello";
     }
 
 //    @PreAuthorize("hasAuthority('ROLE_MEMBER')")
-    @PreAuthorize("hasAuthority('ROLE_USERNAME_UNSET')")
+//    @PreAuthorize("hasAuthority('ROLE_USERNAME_UNSET')")
     @ResponseBody
-    @GetMapping("/test-auth")
-    public String testAuth() {
-        log.info("testAuth");
+    @GetMapping("/unset")
+    public String unset() {
+        log.info("unset");
+        return "success";
+    }
+
+    @ResponseBody
+    @GetMapping("/test-mem")
+    public String member() {
+        log.info("member");
         return "success";
     }
 }

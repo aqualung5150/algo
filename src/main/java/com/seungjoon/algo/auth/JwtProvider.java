@@ -2,6 +2,7 @@ package com.seungjoon.algo.auth;
 
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -43,5 +44,15 @@ public class JwtProvider {
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public Cookie createJwtCookie(String token) {
+        Cookie cookie = new Cookie("access_token", token);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+//        cookie.setMaxAge(10 * 60);
+//        cookie.setSecure(true);
+
+        return cookie;
     }
 }
