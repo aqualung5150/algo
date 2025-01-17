@@ -1,5 +1,8 @@
 package com.seungjoon.algo.auth;
 
+import com.seungjoon.algo.exception.ExceptionCode;
+import com.seungjoon.algo.exception.ExceptionResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,6 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.seungjoon.algo.exception.ExceptionCode.*;
+
 @Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
     @Override
@@ -18,11 +23,17 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 
         try {
             filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            sendErrorResponse(response, new ExceptionResponse(EXPIRED_JWT_TOKEN.getCode(), EXPIRED_JWT_TOKEN.getMessage()));
         } catch (JwtException e) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType("text/plain");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("JWT 예외");
+            sendErrorResponse(response, new ExceptionResponse(INVALID_JWT_TOKEN.getCode(), INVALID_JWT_TOKEN.getMessage()));
         }
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, ExceptionResponse exceptionResponse) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(exceptionResponse.toString());
     }
 }

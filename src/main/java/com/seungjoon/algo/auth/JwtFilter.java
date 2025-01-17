@@ -41,9 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (accessTokenCookie == null) {
-
-            //TODO - no token exception
-            throw new JwtException("No access token found");
+            throw new JwtException("no token found");
         }
 
         String accessToken = accessTokenCookie.getValue();

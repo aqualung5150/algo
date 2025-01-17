@@ -1,11 +1,15 @@
 package com.seungjoon.algo.exception;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RequiredArgsConstructor
-@Getter
-public class ExceptionResponse {
-    private final int code;
-    private final String message;
+public record ExceptionResponse(int code, String message) {
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
