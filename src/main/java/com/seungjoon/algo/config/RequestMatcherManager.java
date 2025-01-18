@@ -29,9 +29,15 @@ public class RequestMatcherManager {
             req(GET, "/hello", null),
             req(GET, "/test-mem", MEMBER),
 
+            //
+            req(GET, "/**", null),
+
             //auth
             req(PATCH, "/auth/set-username", USERNAME_UNSET),
-            req(POST, "/auth/reissue", null)
+            req(POST, "/auth/reissue", null),
+
+            //admin
+            req(GET, "/admin/**", ADMIN)
     );
 
     private record RequestInfo(HttpMethod method, String pattern, Role minRole) {

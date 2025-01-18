@@ -19,10 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig{
 
+    //OAuth2
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    //Filter
     private final JwtFilter jwtFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
+    //RequestMatcher
     private final RequestMatcherManager requestMatcherManager;
 
     @Bean
@@ -43,9 +46,9 @@ public class SecurityConfig{
                 )
 
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(requestMatcherManager.getRequestMatchersByRole(null)).permitAll()
                         .requestMatchers(requestMatcherManager.getRequestMatchersByRole(Role.USERNAME_UNSET)).hasAuthority(Role.USERNAME_UNSET.name())
                         .requestMatchers(requestMatcherManager.getRequestMatchersByRole(Role.MEMBER)).hasAnyAuthority(Role.MEMBER.name(), Role.ADMIN.name())
+                        .requestMatchers(requestMatcherManager.getRequestMatchersByRole(null)).permitAll()
                         .anyRequest().authenticated()
                 )
 

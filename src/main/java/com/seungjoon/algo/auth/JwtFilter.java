@@ -3,6 +3,7 @@ package com.seungjoon.algo.auth;
 import com.seungjoon.algo.auth.oauth.PrincipalDTO;
 import com.seungjoon.algo.auth.oauth.PrincipalDetails;
 import com.seungjoon.algo.config.RequestMatcherManager;
+import com.seungjoon.algo.user.domain.Role;
 import com.seungjoon.algo.utils.CookieUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static com.seungjoon.algo.auth.oauth.JwtType.*;
+import static com.seungjoon.algo.user.domain.Role.*;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +33,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return requestMatcherManager.getRequestMatchersByRole(null).matches(request);
+        return !requestMatcherManager.getRequestMatchersByRole(USERNAME_UNSET).matches(request) &&
+                !requestMatcherManager.getRequestMatchersByRole(MEMBER).matches(request) &&
+                !requestMatcherManager.getRequestMatchersByRole(ADMIN).matches(request);
     }
 
     @Override
