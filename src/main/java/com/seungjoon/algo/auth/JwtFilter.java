@@ -3,6 +3,7 @@ package com.seungjoon.algo.auth;
 import com.seungjoon.algo.auth.oauth.PrincipalDTO;
 import com.seungjoon.algo.auth.oauth.PrincipalDetails;
 import com.seungjoon.algo.config.RequestMatcherManager;
+import com.seungjoon.algo.utils.CookieUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Optional;
+
+import static com.seungjoon.algo.auth.oauth.JwtType.*;
 
 @Component
 @RequiredArgsConstructor
@@ -34,20 +37,16 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        Cookie[] cookies = request.getCookies();
-        Cookie accessTokenCookie = null;
-        if (cookies != null) {
-            accessTokenCookie = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access_token")).findFirst().orElse(null);
-        }
+        Optional<Cookie> accessTokenCookie = CookieUtil.getCookieFromRequest(request, "access_token");
 
-        if (accessTokenCookie == null) {
+        if (accessTokenCookie.isEmpty()) {
             throw new JwtException("no token found");
         }
 
-        String accessToken = accessTokenCookie.getValue();
+        String accessToken = accessTokenCookie.get().getValue();
 
-        Long id = jwtProvider.getId(accessToken);
-        String role = jwtProvider.getRole(accessToken);
+        Long id = jwtProvider.getId(ACCESS, accessToken);
+        String role = jwtProvider.getRole(ACCESS, accessToken);
 
         PrincipalDTO principal = PrincipalDTO.builder()
                 .id(id)

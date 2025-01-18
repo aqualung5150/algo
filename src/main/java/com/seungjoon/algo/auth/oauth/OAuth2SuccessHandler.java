@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import static com.seungjoon.algo.auth.oauth.JwtType.*;
+
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -27,9 +29,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .iterator().next()
                 .getAuthority();
 
-        String token = jwtProvider.generateToken(userDetails.getId(), role, 10 * 60 * 1000L);
+        String accessToken = jwtProvider.generateToken(ACCESS, userDetails.getId(), role, 10 * 60 * 1000L);
+        String refreshToken = jwtProvider.generateToken(REFRESH, userDetails.getId(), role, 10 * 60 * 1000L);
 
-        response.addCookie(jwtProvider.createJwtCookie(token));
+        response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
+        response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
         //TODO - originalURL
         response.sendRedirect("http://localhost:5173/");
 

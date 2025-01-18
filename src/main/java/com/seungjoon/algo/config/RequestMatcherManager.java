@@ -24,14 +24,14 @@ public class RequestMatcherManager {
                 .toArray(AntPathRequestMatcher[]::new));
     }
 
-    // 길이 문제 상 일부만 작성
     private static final List<RequestInfo> REQUEST_INFO_LIST = List.of(
             //test
             req(GET, "/hello", null),
             req(GET, "/test-mem", MEMBER),
 
-            //oauth2
-            req(PATCH, "/oauth2/set-username", USERNAME_UNSET)
+            //auth
+            req(PATCH, "/auth/set-username", USERNAME_UNSET),
+            req(POST, "/auth/reissue", null)
     );
 
     private record RequestInfo(HttpMethod method, String pattern, Role minRole) {

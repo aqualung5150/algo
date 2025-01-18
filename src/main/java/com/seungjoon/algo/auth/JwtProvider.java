@@ -1,5 +1,7 @@
 package com.seungjoon.algo.auth;
 
+import com.seungjoon.algo.auth.oauth.JwtType;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
@@ -11,32 +13,50 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import static com.seungjoon.algo.auth.oauth.JwtType.*;
+
 @Component
 public class JwtProvider {
 
-    private final SecretKey secretKey;
+    private final SecretKey accessKey;
+    private final SecretKey refreshKey;
 
-    public JwtProvider(@Value("${spring.jwt.secret}") String secret) {
-        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+    public JwtProvider(@Value("${spring.jwt.access-key}") String accessKey, @Value("${spring.jwt.refresh-key}") String refreshKey) {
+        this.accessKey = new SecretKeySpec(accessKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+        this.refreshKey = new SecretKeySpec(refreshKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    public Long getId(String token) {
+    public Long getId(JwtType type, String token) {
+        return parseClaims(type, token).get("id", Long.class);
+    }
+
+    public String getRole(JwtType type, String token) {
+        return parseClaims(type, token).get("role", String.class);
+    }
+
+    public boolean isExpired(JwtType type, String token) {
+        return parseClaims(type, token).getExpiration().before(new Date());
+    }
+
+    private Claims parseClaims(JwtType type, String token) {
+        SecretKey secretKey = getSecretKey(type);
         JwtParser jwtParser = Jwts.parser().verifyWith(secretKey).build();
-        return jwtParser.parseSignedClaims(token).getPayload().get("id", Long.class);
+        return jwtParser.parseSignedClaims(token).getPayload();
     }
 
-    public String getRole(String token) {
-        JwtParser jwtParser = Jwts.parser().verifyWith(secretKey).build();
-        return jwtParser.parseSignedClaims(token).getPayload().get("role", String.class);
+    private SecretKey getSecretKey(JwtType type) {
+
+        if (type == ACCESS) {
+            return this.accessKey;
+        }
+        if (type == REFRESH) {
+            return this.refreshKey;
+        }
+        return null;
     }
 
-    public boolean isExpired(String token) {
-        JwtParser jwtParser = Jwts.parser().verifyWith(secretKey).build();
-        return jwtParser.parseSignedClaims(token).getPayload().getExpiration().before(new Date());
-    }
-
-    public String generateToken(Long id, String role, Long expiredMs) {
-
+    public String generateToken(JwtType type, Long id, String role, Long expiredMs) {
+        SecretKey secretKey = getSecretKey(type);
         return Jwts.builder()
                 .claim("id", id)
                 .claim("role", role)
@@ -46,8 +66,8 @@ public class JwtProvider {
                 .compact();
     }
 
-    public Cookie createJwtCookie(String token) {
-        Cookie cookie = new Cookie("access_token", token);
+    public Cookie createJwtCookie(String key, String token) {
+        Cookie cookie = new Cookie(key, token);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
 //        cookie.setMaxAge(10 * 60);
