@@ -5,12 +5,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static com.seungjoon.algo.auth.oauth.JwtType.*;
@@ -21,9 +20,9 @@ public class JwtProvider {
     private final SecretKey accessKey;
     private final SecretKey refreshKey;
 
-    public JwtProvider(@Value("${spring.jwt.access-key}") String accessKey, @Value("${spring.jwt.refresh-key}") String refreshKey) {
-        this.accessKey = new SecretKeySpec(accessKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
-        this.refreshKey = new SecretKeySpec(refreshKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+    public JwtProvider() {
+        this. accessKey = new SecretKeySpec(KeyGenerators.secureRandom(32).generateKey(), Jwts.SIG.HS256.key().build().getAlgorithm());
+        this. refreshKey = new SecretKeySpec(KeyGenerators.secureRandom(32).generateKey(), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
     public Long getId(JwtType type, String token) {
