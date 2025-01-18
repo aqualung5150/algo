@@ -1,21 +1,23 @@
 package com.seungjoon.algo.auth;
 
-import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.ExceptionResponse;
+import com.seungjoon.algo.exception.MissingJwtTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.exception.ExceptionCode.EXPIRED_JWT_TOKEN;
+import static com.seungjoon.algo.exception.ExceptionCode.INVALID_JWT_TOKEN;
 
+@Slf4j
 @Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
     @Override
@@ -23,6 +25,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 
         try {
             filterChain.doFilter(request, response);
+        } catch (MissingJwtTokenException e) {
+            sendErrorResponse(response, new ExceptionResponse(e.getCode(), e.getMessage()));
         } catch (ExpiredJwtException e) {
             sendErrorResponse(response, new ExceptionResponse(EXPIRED_JWT_TOKEN.getCode(), EXPIRED_JWT_TOKEN.getMessage()));
         } catch (JwtException e) {

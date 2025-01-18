@@ -3,9 +3,9 @@ package com.seungjoon.algo.auth;
 import com.seungjoon.algo.auth.oauth.PrincipalDTO;
 import com.seungjoon.algo.auth.oauth.PrincipalDetails;
 import com.seungjoon.algo.config.RequestMatcherManager;
-import com.seungjoon.algo.user.domain.Role;
+import com.seungjoon.algo.exception.ExceptionCode;
+import com.seungjoon.algo.exception.MissingJwtTokenException;
 import com.seungjoon.algo.utils.CookieUtil;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -21,7 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.seungjoon.algo.auth.oauth.JwtType.*;
+import static com.seungjoon.algo.auth.oauth.JwtType.ACCESS;
 import static com.seungjoon.algo.user.domain.Role.*;
 
 @Component
@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
         Optional<Cookie> accessTokenCookie = CookieUtil.getCookieFromRequest(request, "access_token");
 
         if (accessTokenCookie.isEmpty()) {
-            throw new JwtException("no token found");
+            throw new MissingJwtTokenException(ExceptionCode.MISSING_JWT_TOKEN);
         }
 
         String accessToken = accessTokenCookie.get().getValue();

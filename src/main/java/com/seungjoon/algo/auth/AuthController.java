@@ -3,9 +3,10 @@ package com.seungjoon.algo.auth;
 import com.seungjoon.algo.auth.oauth.CustomOAuth2UserService;
 import com.seungjoon.algo.auth.oauth.PrincipalDetails;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
+import com.seungjoon.algo.exception.ExceptionCode;
+import com.seungjoon.algo.exception.MissingJwtTokenException;
 import com.seungjoon.algo.user.domain.User;
 import com.seungjoon.algo.utils.CookieUtil;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,10 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.sasl.AuthenticationException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.seungjoon.algo.auth.oauth.JwtType.*;
+import static com.seungjoon.algo.auth.oauth.JwtType.ACCESS;
+import static com.seungjoon.algo.auth.oauth.JwtType.REFRESH;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,12 +41,12 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public Map<String, String> reissue(@AuthenticationPrincipal PrincipalDetails principal, HttpServletRequest request, HttpServletResponse response) {
+    public Map<String, String> reissue(@AuthenticationPrincipal PrincipalDetails principal, HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         Optional<Cookie> refreshTokenCookie = CookieUtil.getCookieFromRequest(request, "refresh_token");
 
         if (refreshTokenCookie.isEmpty()) {
-            throw new JwtException("no token found");
+            throw new MissingJwtTokenException(ExceptionCode.MISSING_JWT_TOKEN);
         }
 
         String refreshToken = refreshTokenCookie.get().getValue();
