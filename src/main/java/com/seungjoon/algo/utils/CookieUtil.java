@@ -10,7 +10,12 @@ public class CookieUtil {
 
     public static Optional<Cookie> getCookieFromRequest(HttpServletRequest request, String cookieName) {
 
-        return Arrays.stream(request.getCookies())
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return Optional.empty();
+        }
+
+        return Arrays.stream(cookies)
                 .filter(cookie -> cookie
                         .getName()
                         .equals(cookieName)
