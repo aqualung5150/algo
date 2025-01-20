@@ -1,4 +1,4 @@
-package com.seungjoon.algo.auth;
+package com.seungjoon.algo.auth.jwt;
 
 import com.seungjoon.algo.exception.ExceptionResponse;
 import com.seungjoon.algo.exception.MissingJwtTokenException;

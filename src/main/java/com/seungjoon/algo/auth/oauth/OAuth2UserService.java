@@ -1,5 +1,7 @@
 package com.seungjoon.algo.auth.oauth;
 
+import com.seungjoon.algo.auth.PrincipalDto;
+import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.ExceptionCode;
@@ -20,7 +22,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
@@ -39,7 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         User user = saveOrUpdateUser(oAuth2UserInfo);
 
-        PrincipalDTO principal = PrincipalDTO.builder()
+        PrincipalDto principal = PrincipalDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .password(null)

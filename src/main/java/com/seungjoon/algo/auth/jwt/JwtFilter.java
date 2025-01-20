@@ -1,7 +1,7 @@
-package com.seungjoon.algo.auth;
+package com.seungjoon.algo.auth.jwt;
 
-import com.seungjoon.algo.auth.oauth.PrincipalDTO;
-import com.seungjoon.algo.auth.oauth.PrincipalDetails;
+import com.seungjoon.algo.auth.PrincipalDto;
+import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.config.RequestMatcherManager;
 import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.MissingJwtTokenException;
@@ -21,7 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.seungjoon.algo.auth.oauth.JwtType.ACCESS;
+import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
 import static com.seungjoon.algo.user.domain.Role.*;
 
 @Component
@@ -52,7 +52,7 @@ public class JwtFilter extends OncePerRequestFilter {
         Long id = jwtProvider.getId(ACCESS, accessToken);
         String role = jwtProvider.getRole(ACCESS, accessToken);
 
-        PrincipalDTO principal = PrincipalDTO.builder()
+        PrincipalDto principal = PrincipalDto.builder()
                 .id(id)
                 .role(role)
                 .build();

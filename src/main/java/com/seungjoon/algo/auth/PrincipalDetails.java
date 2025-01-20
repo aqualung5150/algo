@@ -1,4 +1,4 @@
-package com.seungjoon.algo.auth.oauth;
+package com.seungjoon.algo.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +12,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PrincipalDetails implements OAuth2User, UserDetails {
 
-    private final PrincipalDTO principal;
+    private final PrincipalDto principal;
 
     @Override
     public String getPassword() {

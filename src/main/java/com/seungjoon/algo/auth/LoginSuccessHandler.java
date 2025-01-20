@@ -1,6 +1,6 @@
-package com.seungjoon.algo.auth.oauth;
+package com.seungjoon.algo.auth;
 
-import com.seungjoon.algo.auth.JwtProvider;
+import com.seungjoon.algo.auth.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.seungjoon.algo.auth.oauth.JwtType.*;
+import static com.seungjoon.algo.auth.jwt.JwtType.*;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
 
@@ -34,7 +34,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
         response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
-        //TODO - originalURL
+        //TODO - originalURL - api응답을 주고 프론트에서 처리해야 할까? - No 리다이렉트를 반드시 해야함.
+        //TODO - USERNAME_UNSET일 때 /auth/set-username으로 리디렉션
         response.sendRedirect("http://localhost:5173/");
 
     }

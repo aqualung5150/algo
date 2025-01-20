@@ -1,6 +1,5 @@
-package com.seungjoon.algo.auth;
+package com.seungjoon.algo.auth.jwt;
 
-import com.seungjoon.algo.auth.oauth.JwtType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -12,7 +11,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
 
-import static com.seungjoon.algo.auth.oauth.JwtType.*;
+import static com.seungjoon.algo.auth.jwt.JwtType.*;
 
 @Component
 public class JwtProvider {

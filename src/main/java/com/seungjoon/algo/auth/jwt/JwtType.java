@@ -1,4 +1,4 @@
-package com.seungjoon.algo.auth.oauth;
+package com.seungjoon.algo.auth.jwt;
 
 public enum JwtType {
 
