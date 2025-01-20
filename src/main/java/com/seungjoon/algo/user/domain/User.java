@@ -22,6 +22,8 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    private String password;
+
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
@@ -36,9 +38,10 @@ public class User {
     }
 
     @Builder
-    public User(String email, String username, String imageUrl, Role role, UserState state) {
+    public User(String email, String username, String password, String imageUrl, Role role, UserState state) {
         this.email = email;
         this.username = username;
+        this.password = password;
         this.imageUrl = imageUrl;
         this.role = role;
         this.state = state;

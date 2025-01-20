@@ -35,6 +35,8 @@ public class RequestMatcherManager {
             //auth
             req(PATCH, "/auth/set-username", USERNAME_UNSET),
             req(POST, "/auth/reissue", null),
+            req(POST, "/auth/signup", null),
+            req(POST, "/auth/login", null),
 
             //admin
             req(GET, "/admin/**", ADMIN)
