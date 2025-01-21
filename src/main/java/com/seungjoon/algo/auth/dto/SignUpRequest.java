@@ -1,6 +1,7 @@
 package com.seungjoon.algo.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
@@ -8,7 +9,7 @@ import lombok.Getter;
 public class SignUpRequest {
 
     @NotBlank
-    //TODO - @Pattern - 정규표현식
+    @Pattern(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "잘못된 이메일 형식입니다.")
     private String email;
 
     @NotBlank
@@ -17,6 +18,6 @@ public class SignUpRequest {
     private String username;
 
     @NotBlank
-    //TODO - @Pattern - 정규표현식
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*?_])(?=\\S+$).{8,20}$", message = "대문자, 소문자, 특수문자를 포함한 8~12자리 비밀번호여야 합니다.")
     private String password;
 }
