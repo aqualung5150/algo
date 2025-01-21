@@ -39,8 +39,6 @@ public class AuthService {
             throw new BadRequestException(USERNAME_ALREADY_EXIST);
         }
 
-        //TODO password 검증
-
         return userRepository.save(User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -57,9 +55,7 @@ public class AuthService {
             throw new UnauthorizedException(INVALID_PASSWORD);
         }
 
-        //TODO - Success Handling
-
-        log.info("로그인 성공");
+//        log.info("로그인 성공");
         return user;
     }
 }

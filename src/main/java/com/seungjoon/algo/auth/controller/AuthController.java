@@ -75,10 +75,16 @@ public class AuthController {
         return new UserResponse(user);
     }
 
-    //TODO
     @PostMapping("/login")
-    public UserResponse login(@Valid @RequestBody LoginRequest request) {
+    public UserResponse login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         User user = authService.login(request);
+
+        String accessToken = jwtProvider.generateToken(ACCESS, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
+        String refreshToken = jwtProvider.generateToken(REFRESH, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
+
+        response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
+        response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
+
         return new UserResponse(user);
     }
 }
