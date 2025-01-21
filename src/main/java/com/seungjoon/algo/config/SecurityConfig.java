@@ -3,7 +3,7 @@ package com.seungjoon.algo.config;
 import com.seungjoon.algo.auth.jwt.JwtExceptionFilter;
 import com.seungjoon.algo.auth.jwt.JwtFilter;
 import com.seungjoon.algo.auth.oauth.OAuth2UserService;
-import com.seungjoon.algo.auth.LoginSuccessHandler;
+import com.seungjoon.algo.auth.oauth.OAuth2SuccessHandler;
 import com.seungjoon.algo.user.domain.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +20,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig{
 
     //Authentication
-    private final OAuth2UserService OAuth2UserService;
-    private final LoginSuccessHandler loginSuccessHandler;
+    private final OAuth2UserService oAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
     //Filter
     private final JwtFilter jwtFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
@@ -41,8 +41,8 @@ public class SecurityConfig{
 
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
-                        .userService(OAuth2UserService))
-                        .successHandler(loginSuccessHandler)
+                        .userService(oAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
                 )
 
                 .authorizeHttpRequests((auth) -> auth

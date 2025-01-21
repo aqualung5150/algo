@@ -1,5 +1,6 @@
-package com.seungjoon.algo.auth;
+package com.seungjoon.algo.auth.oauth;
 
+import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +16,7 @@ import static com.seungjoon.algo.auth.jwt.JwtType.*;
 
 @Component
 @RequiredArgsConstructor
-public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
 
@@ -34,9 +35,14 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
         response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
-        //TODO - originalURL - api응답을 주고 프론트에서 처리해야 할까? - No 리다이렉트를 반드시 해야함.
-        //TODO - USERNAME_UNSET일 때 /auth/set-username으로 리디렉션
-        response.sendRedirect("http://localhost:5173/");
+
+        if (role.equals("USERNAME_UNSET")) {
+            response.sendRedirect("http://localhost:5173/set-username");
+        } else {
+            //TODO - originalURL - api응답을 주고 프론트에서 처리해야 할까? - No 리다이렉트를 반드시 해야함.
+            //TODO - USERNAME_UNSET일 때 /auth/set-username으로 리디렉션
+            response.sendRedirect("http://localhost:5173/");
+        }
 
     }
 }
