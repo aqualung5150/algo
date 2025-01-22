@@ -11,8 +11,6 @@ import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.MissingJwtTokenException;
 import com.seungjoon.algo.user.domain.User;
 import com.seungjoon.algo.user.dto.UserResponse;
-import com.seungjoon.algo.utils.CookieUtil;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -20,9 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.security.sasl.AuthenticationException;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
 import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
@@ -57,15 +53,15 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public Map<String, String> reissue(@AuthenticationPrincipal PrincipalDetails principal, HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    public Map<String, String> reissue(
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @CookieValue(value = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
 
-        Optional<Cookie> refreshTokenCookie = CookieUtil.getCookieFromRequest(request, "refresh_token");
-
-        if (refreshTokenCookie.isEmpty()) {
+        if (refreshToken == null) {
             throw new MissingJwtTokenException(ExceptionCode.MISSING_JWT_TOKEN);
         }
-
-        String refreshToken = refreshTokenCookie.get().getValue();
 
         Long id = jwtProvider.getId(REFRESH, refreshToken);
         String role = jwtProvider.getRole(REFRESH, refreshToken);
