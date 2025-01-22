@@ -29,29 +29,29 @@ public class AuthService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public User signUp(SignUpRequest request) {
+    public User signUp(SignUpRequest signUpRequest) {
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new BadRequestException(EMAIL_ALREADY_EXIST);
         }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             throw new BadRequestException(USERNAME_ALREADY_EXIST);
         }
 
         return userRepository.save(User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .email(signUpRequest.getEmail())
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .role(MEMBER)
-                .username(request.getUsername())
+                .username(signUpRequest.getUsername())
                 .state(UserState.ACTIVE)
                 .build());
     }
 
-    public User login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadRequestException(NOT_FOUND_USER));
+    public User login(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new BadRequestException(NOT_FOUND_USER));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new UnauthorizedException(INVALID_PASSWORD);
         }
 

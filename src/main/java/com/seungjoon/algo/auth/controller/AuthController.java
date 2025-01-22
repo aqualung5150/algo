@@ -78,15 +78,15 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public UserResponse signup(@Valid @RequestBody SignUpRequest request) {
+    public UserResponse signup(@Valid @RequestBody SignUpRequest signUpRequest) {
 
-        User user = authService.signUp(request);
+        User user = authService.signUp(signUpRequest);
         return new UserResponse(user);
     }
 
     @PostMapping("/login")
-    public UserResponse login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
-        User user = authService.login(request);
+    public UserResponse login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        User user = authService.login(loginRequest);
 
         String accessToken = jwtProvider.generateToken(ACCESS, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
         String refreshToken = jwtProvider.generateToken(REFRESH, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
