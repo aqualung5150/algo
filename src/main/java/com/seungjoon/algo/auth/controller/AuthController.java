@@ -37,10 +37,19 @@ public class AuthController {
     private final JwtProvider jwtProvider;
 
     @PatchMapping("/set-username")
-    public Map<String, String> setUsername(@AuthenticationPrincipal PrincipalDetails principal, @Valid @RequestBody SetUsernameRequest request, HttpServletResponse response) {
+    public Map<String, String> setUsername(
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @Valid @RequestBody SetUsernameRequest setUsernameRequest,
+           HttpServletRequest request,
+           HttpServletResponse response
+    ) {
 
-        User user = oAuth2UserService.setUsername(principal.getId(), request);
+        User user = oAuth2UserService.setUsername(principal.getId(), setUsernameRequest);
 
+        //redirectUrl 세션 삭제
+        request.getSession().removeAttribute("redirectUrl");
+
+        //토큰 발급
         String token = jwtProvider.generateToken(ACCESS, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
         response.addCookie(jwtProvider.createJwtCookie("access_token", token));
 

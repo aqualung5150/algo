@@ -3,6 +3,7 @@ package com.seungjoon.algo.auth.oauth;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,18 +13,27 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.seungjoon.algo.auth.jwt.JwtType.*;
+import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
+import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    private static final String REDIRECT_URL = "redirectUrl";
 
     private final JwtProvider jwtProvider;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        //OAuth2 User
+        // 로그인 성공 시 브라우저 쿠키 삭제
+        Cookie cookie = new Cookie(REDIRECT_URL, null);
+        cookie.setDomain("localhost");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
         PrincipalDetails userDetails = (PrincipalDetails) authentication.getPrincipal();
 
         String role = authentication.getAuthorities()
@@ -39,9 +49,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (role.equals("USERNAME_UNSET")) {
             response.sendRedirect("http://localhost:5173/set-username");
         } else {
-            //TODO - originalURL - api응답을 주고 프론트에서 처리해야 할까? - No 리다이렉트를 반드시 해야함.
-            //TODO - USERNAME_UNSET일 때 /auth/set-username으로 리디렉션
-            response.sendRedirect("http://localhost:5173/");
+            request.getSession().removeAttribute("redirectUrl");
+            response.sendRedirect(request.getSession().getAttribute("redirectUrl").toString());
+
         }
 
     }

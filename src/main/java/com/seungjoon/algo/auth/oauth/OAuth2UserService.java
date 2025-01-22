@@ -1,7 +1,7 @@
 package com.seungjoon.algo.auth.oauth;
 
-import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.auth.PrincipalDetails;
+import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.ExceptionCode;
@@ -9,6 +9,9 @@ import com.seungjoon.algo.user.domain.Role;
 import com.seungjoon.algo.user.domain.User;
 import com.seungjoon.algo.user.domain.UserState;
 import com.seungjoon.algo.user.repository.UserRepository;
+import com.seungjoon.algo.utils.CookieUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -25,9 +28,16 @@ import java.util.UUID;
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final HttpServletRequest request;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+
+        Cookie redirectCookie = CookieUtil.getCookieFromRequest(request, "redirectUrl").orElse(null);
+        String redirectUrl = redirectCookie == null ? "http://localhost:5173/" : redirectCookie.getValue();
+
+        request.getSession().setAttribute("redirectUrl", redirectUrl);
+
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
