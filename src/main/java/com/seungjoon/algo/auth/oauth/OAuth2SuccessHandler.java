@@ -49,9 +49,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (role.equals("USERNAME_UNSET")) {
             response.sendRedirect("http://localhost:5173/set-username");
         } else {
-            request.getSession().removeAttribute("redirectUrl");
-            response.sendRedirect(request.getSession().getAttribute("redirectUrl").toString());
-
+            response.sendRedirect(request.getSession().getAttribute(REDIRECT_URL).toString());
+            request.getSession().removeAttribute(REDIRECT_URL);
         }
 
     }
