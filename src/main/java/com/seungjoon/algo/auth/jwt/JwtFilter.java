@@ -24,7 +24,7 @@ import java.util.Optional;
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
 import static com.seungjoon.algo.user.domain.Role.*;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 

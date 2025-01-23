@@ -18,7 +18,7 @@ import static com.seungjoon.algo.exception.ExceptionCode.EXPIRED_JWT_TOKEN;
 import static com.seungjoon.algo.exception.ExceptionCode.INVALID_JWT_TOKEN;
 
 @Slf4j
-@Component
+//@Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

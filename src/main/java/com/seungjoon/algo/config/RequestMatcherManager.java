@@ -6,7 +6,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +13,6 @@ import java.util.Objects;
 import static com.seungjoon.algo.user.domain.Role.*;
 import static org.springframework.http.HttpMethod.*;
 
-@Component
 public class RequestMatcherManager {
 
     public RequestMatcher getRequestMatchersByRole(@Nullable Role minRole) {
@@ -37,6 +35,7 @@ public class RequestMatcherManager {
             req(POST, "/auth/reissue", null),
             req(POST, "/auth/signup", null),
             req(POST, "/auth/login", null),
+            req(POST, "/login", null),
 
             //admin
             req(GET, "/admin/**", ADMIN)

@@ -1,25 +1,27 @@
-package com.seungjoon.algo.auth.oauth;
+package com.seungjoon.algo.auth;
 
-import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
 import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
 
-@Component
+//@Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    @Value("${spring.frontend.base-url}")
+    private String defaultRedirectUrl;
     private static final String REDIRECT_URL = "redirectUrl";
 
     private final JwtProvider jwtProvider;
@@ -46,10 +48,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
         response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
 
+        String redirectUrl = request.getSession().getAttribute(REDIRECT_URL).toString();
+        if (!StringUtils.hasText(redirectUrl)) {
+            redirectUrl = defaultRedirectUrl;
+        }
+
         if (role.equals("USERNAME_UNSET")) {
             response.sendRedirect("http://localhost:5173/set-username");
         } else {
-            response.sendRedirect(request.getSession().getAttribute(REDIRECT_URL).toString());
+            response.sendRedirect(redirectUrl);
             request.getSession().removeAttribute(REDIRECT_URL);
         }
 
