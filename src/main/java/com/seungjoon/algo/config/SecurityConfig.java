@@ -1,5 +1,6 @@
 package com.seungjoon.algo.config;
 
+import com.seungjoon.algo.auth.AuthenticationFailureHandler;
 import com.seungjoon.algo.auth.JsonAuthenticationFilter;
 import com.seungjoon.algo.auth.jwt.JwtExceptionFilter;
 import com.seungjoon.algo.auth.jwt.JwtFilter;
@@ -84,15 +85,19 @@ public class SecurityConfig{
     }
 
     @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new AuthenticationSuccessHandler(jwtProvider);
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(PasswordEncoderFactories.createDelegatingPasswordEncoder());
         provider.setUserDetailsService(userDetailsService);
         return new ProviderManager(provider);
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new AuthenticationSuccessHandler(jwtProvider);
+    }
+
+    @Bean public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new AuthenticationFailureHandler();
     }
 
     @Bean
@@ -101,6 +106,7 @@ public class SecurityConfig{
         JsonAuthenticationFilter jsonAuthenticationFilter = new JsonAuthenticationFilter("/login");
         jsonAuthenticationFilter.setAuthenticationManager(authenticationManager());
         jsonAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
+        jsonAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
         return jsonAuthenticationFilter;
     }
 }
