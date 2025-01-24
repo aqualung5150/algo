@@ -49,6 +49,7 @@ public class SecurityConfig{
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(oAuth2UserService))
                         .successHandler(authenticationSuccessHandler())
+                        .failureHandler(authenticationFailureHandler())
                 )
 
                 .authorizeHttpRequests((auth) -> auth
