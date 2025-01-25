@@ -48,7 +48,7 @@ public class JsonAuthenticationFilter extends AbstractAuthenticationProcessingFi
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
-        return getAuthenticationManager().authenticate(authToken);
+        return this.getAuthenticationManager().authenticate(authToken);
     }
 
     private void storeSessionRedirectUrl(HttpServletRequest request) {

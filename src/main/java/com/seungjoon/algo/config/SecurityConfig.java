@@ -1,16 +1,14 @@
 package com.seungjoon.algo.config;
 
 import com.seungjoon.algo.auth.AuthenticationFailureHandler;
+import com.seungjoon.algo.auth.AuthenticationSuccessHandler;
 import com.seungjoon.algo.auth.JsonAuthenticationFilter;
 import com.seungjoon.algo.auth.jwt.JwtExceptionFilter;
 import com.seungjoon.algo.auth.jwt.JwtFilter;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import com.seungjoon.algo.auth.oauth.OAuth2SuccessHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2UserService;
-import com.seungjoon.algo.auth.AuthenticationSuccessHandler;
 import com.seungjoon.algo.user.domain.Role;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,14 +20,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-
-import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
