@@ -53,6 +53,13 @@ public class SecurityConfig{
                 .addFilterBefore(jwtExceptionFilter(), JwtFilter.class)
                 .addFilterAt(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
+                .logout(logout -> logout
+                        .deleteCookies("access_token", "refresh_token")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        })
+                )
+
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(oAuth2UserService))
