@@ -1,6 +1,6 @@
-package com.seungjoon.algo.auth;
+package com.seungjoon.algo.auth.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -13,21 +13,18 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
 
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
 import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
 
 @RequiredArgsConstructor
-public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Value("${spring.frontend.base-url}")
     private String defaultRedirectUrl;
     private static final String REDIRECT_URL = "redirectUrl";
 
     private final JwtProvider jwtProvider;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -56,13 +53,12 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
             redirectUrl = defaultRedirectUrl;
         }
 
-        Map<String, ? extends Serializable> body = Map.of("message", "success", "redirectUrl", redirectUrl);
+        if (role.equals("USERNAME_UNSET")) {
+            response.sendRedirect("http://localhost:5173/set-username");
+        } else {
+            response.sendRedirect(redirectUrl);
+            request.getSession().removeAttribute(REDIRECT_URL);
+        }
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(body));
-
-        request.getSession().removeAttribute(REDIRECT_URL);
     }
 }

@@ -5,9 +5,13 @@ import com.seungjoon.algo.auth.JsonAuthenticationFilter;
 import com.seungjoon.algo.auth.jwt.JwtExceptionFilter;
 import com.seungjoon.algo.auth.jwt.JwtFilter;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
+import com.seungjoon.algo.auth.oauth.OAuth2SuccessHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2UserService;
 import com.seungjoon.algo.auth.AuthenticationSuccessHandler;
 import com.seungjoon.algo.user.domain.Role;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +22,14 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -48,8 +56,7 @@ public class SecurityConfig{
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(oAuth2UserService))
-                        .successHandler(authenticationSuccessHandler())
-                        .failureHandler(authenticationFailureHandler())
+                        .successHandler(oAuth2SuccessHandler())
                 )
 
                 .authorizeHttpRequests((auth) -> auth
@@ -83,6 +90,11 @@ public class SecurityConfig{
     @Bean
     public JwtExceptionFilter jwtExceptionFilter() {
         return new JwtExceptionFilter();
+    }
+
+    @Bean
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
+        return new OAuth2SuccessHandler(jwtProvider);
     }
 
     @Bean
