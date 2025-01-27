@@ -1,5 +1,6 @@
 package com.seungjoon.algo.auth.oauth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
@@ -33,6 +34,8 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     @Value("${spring.frontend.base-url}")
     private String defaultRedirectUrl;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
@@ -45,6 +48,8 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         OAuth2UserInfo oAuth2UserInfo = null;
         if (registrationId.equals("google")) {
             oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+        } else if (registrationId.equals("naver")) {
+            oAuth2UserInfo = new NaverUserInfo(oAuth2User.getAttributes());
         } else {
             return null;
         }
