@@ -6,6 +6,7 @@ import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.ExceptionCode;
+import com.seungjoon.algo.exception.OtherAuthTypeException;
 import com.seungjoon.algo.user.domain.Role;
 import com.seungjoon.algo.user.domain.User;
 import com.seungjoon.algo.user.domain.UserState;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+
+import static com.seungjoon.algo.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +75,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .orElse(null);
 
         if (exist != null) {
+            if (!exist.getAuthType().equals(oAuth2UserInfo.getProvider())) {
+                ExceptionCode exceptionCode = getOtherAuthTypeExceptionCode(exist.getAuthType());
+                throw new OtherAuthTypeException(exceptionCode);
+            }
+
             exist.changeImageUrl(oAuth2UserInfo.getImageUrl());
             return exist;
         }
@@ -80,6 +88,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 User.builder()
                 .email(oAuth2UserInfo.getEmail())
                 .username(UUID.randomUUID().toString())
+                .authType(oAuth2UserInfo.getProvider())
                 .role(Role.USERNAME_UNSET)
                 .state(UserState.ACTIVE)
                 .imageUrl(oAuth2UserInfo.getImageUrl())
@@ -89,7 +98,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     public User setUsername(Long userId, SetUsernameRequest request) {
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException(NOT_FOUND_USER));
 
         user.changeUsername(request.getUsername());
         user.changeRole(Role.MEMBER);
@@ -101,5 +110,19 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         Cookie redirectCookie = CookieUtil.getCookieFromRequest(request, "redirectUrl").orElse(null);
         String redirectUrl = redirectCookie == null ? defaultRedirectUrl : redirectCookie.getValue();
         request.getSession().setAttribute("redirectUrl", redirectUrl);
+    }
+
+    private ExceptionCode getOtherAuthTypeExceptionCode(String authType) {
+
+        ExceptionCode exceptionCode = null;
+        if (authType.equals("google")) {
+            exceptionCode = AUTH_TYPE_GOOGLE;
+        } else if (authType.equals("naver")) {
+            exceptionCode = AUTH_TYPE_NAVER;
+        } else {
+            exceptionCode = AUTH_TYPE_NORMAL;
+        }
+
+        return exceptionCode;
     }
 }

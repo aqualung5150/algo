@@ -26,6 +26,8 @@ public class User {
 
     private String imageUrl;
 
+    String authType;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -38,11 +40,12 @@ public class User {
     }
 
     @Builder
-    public User(String email, String username, String password, String imageUrl, Role role, UserState state) {
+    public User(String email, String username, String password, String imageUrl, String authType, Role role, UserState state) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.imageUrl = imageUrl;
+        this.authType = authType;
         this.role = role;
         this.state = state;
 
