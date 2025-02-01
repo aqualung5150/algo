@@ -6,7 +6,7 @@ import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.ExceptionCode;
-import com.seungjoon.algo.exception.OtherAuthTypeException;
+import com.seungjoon.algo.exception.ExistingAuthTypeException;
 import com.seungjoon.algo.user.domain.Role;
 import com.seungjoon.algo.user.domain.User;
 import com.seungjoon.algo.user.domain.UserState;
@@ -77,7 +77,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         if (exist != null) {
             if (!exist.getAuthType().equals(oAuth2UserInfo.getProvider())) {
                 ExceptionCode exceptionCode = getOtherAuthTypeExceptionCode(exist.getAuthType());
-                throw new OtherAuthTypeException(exceptionCode);
+                throw new ExistingAuthTypeException(exceptionCode);
             }
 
             exist.changeImageUrl(oAuth2UserInfo.getImageUrl());
@@ -96,6 +96,20 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         );
     }
 
+    private ExceptionCode getOtherAuthTypeExceptionCode(String authType) {
+
+        ExceptionCode exceptionCode = null;
+        if (authType.equals("google")) {
+            exceptionCode = EXISTING_GOOGLE_USER;
+        } else if (authType.equals("naver")) {
+            exceptionCode = EXISTING_NAVER_USER;
+        } else {
+            exceptionCode = EXISTING_NORMAL_USER;
+        }
+
+        return exceptionCode;
+    }
+
     public User setUsername(Long userId, SetUsernameRequest request) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException(NOT_FOUND_USER));
@@ -110,19 +124,5 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         Cookie redirectCookie = CookieUtil.getCookieFromRequest(request, "redirectUrl").orElse(null);
         String redirectUrl = redirectCookie == null ? defaultRedirectUrl : redirectCookie.getValue();
         request.getSession().setAttribute("redirectUrl", redirectUrl);
-    }
-
-    private ExceptionCode getOtherAuthTypeExceptionCode(String authType) {
-
-        ExceptionCode exceptionCode = null;
-        if (authType.equals("google")) {
-            exceptionCode = AUTH_TYPE_GOOGLE;
-        } else if (authType.equals("naver")) {
-            exceptionCode = AUTH_TYPE_NAVER;
-        } else {
-            exceptionCode = AUTH_TYPE_NORMAL;
-        }
-
-        return exceptionCode;
     }
 }

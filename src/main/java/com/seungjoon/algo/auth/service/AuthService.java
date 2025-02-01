@@ -1,11 +1,10 @@
 package com.seungjoon.algo.auth.service;
 
-import com.seungjoon.algo.auth.dto.LoginRequest;
 import com.seungjoon.algo.auth.dto.SignUpRequest;
 import com.seungjoon.algo.exception.BadRequestException;
-import com.seungjoon.algo.exception.UnauthorizedException;
+import com.seungjoon.algo.exception.ExceptionCode;
+import com.seungjoon.algo.exception.ExistingAuthTypeException;
 import com.seungjoon.algo.user.domain.User;
-import com.seungjoon.algo.user.domain.UserState;
 import com.seungjoon.algo.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -13,8 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.seungjoon.algo.exception.ExceptionCode.*;
 import static com.seungjoon.algo.user.domain.Role.MEMBER;
+import static com.seungjoon.algo.user.domain.UserState.ACTIVE;
 
 @Slf4j
 @Service
@@ -31,9 +33,10 @@ public class AuthService {
 
     public User signUp(SignUpRequest signUpRequest) {
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new BadRequestException(EMAIL_ALREADY_EXIST);
-        }
+        userRepository.findByEmail(signUpRequest.getEmail()).ifPresent(user -> {
+            ExceptionCode exceptionCode = getExistingAuthTypeExceptionCode(user.getAuthType());
+            throw new ExistingAuthTypeException(exceptionCode);
+        });
 
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             throw new BadRequestException(USERNAME_ALREADY_EXIST);
@@ -42,9 +45,22 @@ public class AuthService {
         return userRepository.save(User.builder()
                 .email(signUpRequest.getEmail())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .authType("normal")
                 .role(MEMBER)
                 .username(signUpRequest.getUsername())
-                .state(UserState.ACTIVE)
+                .state(ACTIVE)
                 .build());
+    }
+
+    private ExceptionCode getExistingAuthTypeExceptionCode(String authType) {
+        if (authType.equals("google")) {
+            return EXISTING_GOOGLE_USER;
+        }
+
+        if (authType.equals("naver")) {
+            return EXISTING_NAVER_USER;
+        }
+
+        return EMAIL_ALREADY_EXIST;
     }
 }

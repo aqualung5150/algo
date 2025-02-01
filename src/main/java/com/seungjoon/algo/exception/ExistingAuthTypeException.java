@@ -1,12 +1,15 @@
 package com.seungjoon.algo.exception;
 
+import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public class OtherAuthTypeException extends AuthenticationException {
+@Getter
+public class ExistingAuthTypeException extends AuthenticationException {
     private final int code;
     private final String message;
 
-    public OtherAuthTypeException(ExceptionCode exceptionCode) {
+    public ExistingAuthTypeException(ExceptionCode exceptionCode) {
         super(exceptionCode.getMessage());
         this.code = exceptionCode.getCode();
         this.message = exceptionCode.getMessage();

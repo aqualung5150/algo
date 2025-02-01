@@ -72,4 +72,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(BAD_REQUEST.getCode(), BAD_REQUEST.getMessage()));
     }
+
+    @ExceptionHandler(ExistingAuthTypeException.class)
+    public ResponseEntity<ExceptionResponse> handleExistingAuthTypeException(ExistingAuthTypeException e) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(e.getCode(), e.getMessage()));
+    }
 }
