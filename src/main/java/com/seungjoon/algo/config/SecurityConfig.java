@@ -6,6 +6,7 @@ import com.seungjoon.algo.auth.JsonAuthenticationFilter;
 import com.seungjoon.algo.auth.jwt.JwtExceptionFilter;
 import com.seungjoon.algo.auth.jwt.JwtFilter;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
+import com.seungjoon.algo.auth.oauth.OAuth2FailureHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2SuccessHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2UserService;
 import com.seungjoon.algo.user.domain.Role;
@@ -58,6 +59,7 @@ public class SecurityConfig{
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
+                        .failureHandler(oAuth2FailureHandler())
                 )
 
                 .authorizeHttpRequests((auth) -> auth
@@ -97,6 +99,9 @@ public class SecurityConfig{
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
         return new OAuth2SuccessHandler(jwtProvider);
     }
+
+    @Bean
+    public OAuth2FailureHandler oAuth2FailureHandler() { return new OAuth2FailureHandler(); }
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
