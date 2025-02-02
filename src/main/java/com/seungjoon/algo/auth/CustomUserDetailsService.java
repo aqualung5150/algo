@@ -17,7 +17,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("user not found [" + email + "]"));
+
+        if (user.getPassword() == null) {
+            throw new UsernameNotFoundException("user not found [" + email + "]");
+        }
 
         PrincipalDto principal = PrincipalDto.builder()
                 .id(user.getId())
