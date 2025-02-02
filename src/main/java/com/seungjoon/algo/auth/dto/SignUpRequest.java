@@ -3,9 +3,10 @@ package com.seungjoon.algo.auth.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public class SignUpRequest {
 
     @NotBlank
