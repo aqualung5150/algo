@@ -3,8 +3,6 @@ package com.seungjoon.algo.auth.oauth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.PrincipalDto;
-import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
-import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.ExistingAuthTypeException;
 import com.seungjoon.algo.user.domain.Role;
@@ -108,16 +106,6 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         }
 
         return exceptionCode;
-    }
-
-    public User setUsername(Long userId, SetUsernameRequest request) {
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException(NOT_FOUND_USER));
-
-        user.changeUsername(request.getUsername());
-        user.changeRole(Role.MEMBER);
-
-        return user;
     }
 
     private void storeSessionRedirectUrl() {

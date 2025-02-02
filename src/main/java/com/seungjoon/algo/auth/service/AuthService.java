@@ -1,9 +1,11 @@
 package com.seungjoon.algo.auth.service;
 
 import com.seungjoon.algo.auth.dto.SignUpRequest;
+import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.ExistingAuthTypeException;
+import com.seungjoon.algo.user.domain.Role;
 import com.seungjoon.algo.user.domain.User;
 import com.seungjoon.algo.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +13,6 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
 import static com.seungjoon.algo.user.domain.Role.MEMBER;
@@ -61,6 +61,16 @@ public class AuthService {
             return EXISTING_NAVER_USER;
         }
 
-        return EMAIL_ALREADY_EXIST;
+        return EXISTING_NORMAL_USER;
+    }
+
+    public User setUsername(Long userId, SetUsernameRequest request) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException(NOT_FOUND_USER));
+
+        user.changeUsername(request.getUsername());
+        user.changeRole(Role.MEMBER);
+
+        return user;
     }
 }

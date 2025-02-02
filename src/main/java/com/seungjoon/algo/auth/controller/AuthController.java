@@ -3,7 +3,6 @@ package com.seungjoon.algo.auth.controller;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.dto.SignUpRequest;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
-import com.seungjoon.algo.auth.oauth.OAuth2UserService;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.auth.service.AuthService;
 import com.seungjoon.algo.exception.ExceptionCode;
@@ -28,7 +27,6 @@ import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
 public class AuthController {
 
     private final AuthService authService;
-    private final OAuth2UserService oAuth2UserService;
     private final JwtProvider jwtProvider;
 
     @PatchMapping("/set-username")
@@ -39,14 +37,16 @@ public class AuthController {
            HttpServletResponse response
     ) {
 
-        User user = oAuth2UserService.setUsername(principal.getId(), setUsernameRequest);
+        User user = authService.setUsername(principal.getId(), setUsernameRequest);
 
         //redirectUrl 세션 삭제
         request.getSession().removeAttribute("redirectUrl");
 
         //토큰 발급
-        String token = jwtProvider.generateToken(ACCESS, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
-        response.addCookie(jwtProvider.createJwtCookie("access_token", token));
+        String accessToken = jwtProvider.generateToken(ACCESS, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
+        String refreshToken = jwtProvider.generateToken(REFRESH, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
+        response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
+        response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
 
         return Map.of("message", "new token generated");
     }
