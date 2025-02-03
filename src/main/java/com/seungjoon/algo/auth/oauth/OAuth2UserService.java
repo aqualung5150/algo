@@ -5,10 +5,10 @@ import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.ExistingAuthTypeException;
-import com.seungjoon.algo.user.domain.Role;
-import com.seungjoon.algo.user.domain.User;
-import com.seungjoon.algo.user.domain.UserState;
-import com.seungjoon.algo.user.repository.UserRepository;
+import com.seungjoon.algo.member.domain.Role;
+import com.seungjoon.algo.member.domain.Member;
+import com.seungjoon.algo.member.domain.MemberState;
+import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.utils.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ import static com.seungjoon.algo.exception.ExceptionCode.*;
 @Transactional
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final HttpServletRequest request;
     @Value("${spring.frontend.base-url}")
     private String defaultRedirectUrl;
@@ -55,21 +55,21 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
-        User user = saveOrUpdateUser(oAuth2UserInfo);
+        Member member = saveOrUpdateUser(oAuth2UserInfo);
 
         PrincipalDto principal = PrincipalDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
+                .id(member.getId())
+                .username(member.getUsername())
                 .password(null)
                 .name(oAuth2UserInfo.getProvider() + "_" + oAuth2UserInfo.getProviderId())
-                .role(user.getRole().name())
+                .role(member.getRole().name())
                 .build();
 
         return new PrincipalDetails(principal);
     }
 
-    private User saveOrUpdateUser(OAuth2UserInfo oAuth2UserInfo) {
-        User exist = userRepository.findByEmail(oAuth2UserInfo.getEmail())
+    private Member saveOrUpdateUser(OAuth2UserInfo oAuth2UserInfo) {
+        Member exist = memberRepository.findByEmail(oAuth2UserInfo.getEmail())
                 .orElse(null);
 
         if (exist != null) {
@@ -82,13 +82,13 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             return exist;
         }
 
-        return userRepository.save(
-                User.builder()
+        return memberRepository.save(
+                Member.builder()
                 .email(oAuth2UserInfo.getEmail())
                 .username(UUID.randomUUID().toString())
                 .authType(oAuth2UserInfo.getProvider())
                 .role(Role.USERNAME_UNSET)
-                .state(UserState.ACTIVE)
+                .state(MemberState.ACTIVE)
                 .imageUrl(oAuth2UserInfo.getImageUrl())
                 .build()
         );
@@ -98,11 +98,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
         ExceptionCode exceptionCode = null;
         if (authType.equals("google")) {
-            exceptionCode = EXISTING_GOOGLE_USER;
+            exceptionCode = EXISTING_GOOGLE_MEMBER;
         } else if (authType.equals("naver")) {
-            exceptionCode = EXISTING_NAVER_USER;
+            exceptionCode = EXISTING_NAVER_MEMBER;
         } else {
-            exceptionCode = EXISTING_NORMAL_USER;
+            exceptionCode = EXISTING_NORMAL_MEMBER;
         }
 
         return exceptionCode;

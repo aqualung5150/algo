@@ -1,12 +1,11 @@
 package com.seungjoon.algo.config;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import static com.seungjoon.algo.user.domain.Role.ADMIN;
-import static com.seungjoon.algo.user.domain.Role.MEMBER;
+import static com.seungjoon.algo.member.domain.Role.ADMIN;
+import static com.seungjoon.algo.member.domain.Role.MEMBER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

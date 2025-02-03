@@ -1,4 +1,4 @@
-package com.seungjoon.algo.user.domain;
+package com.seungjoon.algo.member.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "member_id")
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -32,15 +32,15 @@ public class User {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    private UserState state;
+    private MemberState state;
 
-    public User(String email, String username) {
+    public Member(String email, String username) {
         this.email = email;
         this.username = username;
     }
 
     @Builder
-    public User(String email, String username, String password, String imageUrl, String authType, Role role, UserState state) {
+    public Member(String email, String username, String password, String imageUrl, String authType, Role role, MemberState state) {
         this.email = email;
         this.username = username;
         this.password = password;

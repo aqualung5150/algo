@@ -5,10 +5,8 @@ import com.seungjoon.algo.auth.dto.SignUpRequest;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.auth.service.AuthService;
-import com.seungjoon.algo.exception.ExceptionCode;
-import com.seungjoon.algo.exception.MissingJwtTokenException;
-import com.seungjoon.algo.user.domain.User;
-import com.seungjoon.algo.user.dto.UserResponse;
+import com.seungjoon.algo.member.domain.Member;
+import com.seungjoon.algo.member.dto.MemberResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -37,14 +35,14 @@ public class AuthController {
            HttpServletResponse response
     ) {
 
-        User user = authService.setUsername(principal.getId(), setUsernameRequest);
+        Member member = authService.setUsername(principal.getId(), setUsernameRequest);
 
         //redirectUrl 세션 삭제
         request.getSession().removeAttribute("redirectUrl");
 
         //토큰 발급
-        String accessToken = jwtProvider.generateToken(ACCESS, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
-        String refreshToken = jwtProvider.generateToken(REFRESH, user.getId(), user.getRole().name(), 10 * 60 * 1000L);
+        String accessToken = jwtProvider.generateToken(ACCESS, member.getId(), member.getRole().name(), 10 * 60 * 1000L);
+        String refreshToken = jwtProvider.generateToken(REFRESH, member.getId(), member.getRole().name(), 10 * 60 * 1000L);
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
         response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
 
@@ -71,9 +69,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public UserResponse signup(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public MemberResponse signup(@Valid @RequestBody SignUpRequest signUpRequest) {
 
-        User user = authService.signUp(signUpRequest);
-        return new UserResponse(user);
+        Member member = authService.signUp(signUpRequest);
+        return new MemberResponse(member);
     }
 }

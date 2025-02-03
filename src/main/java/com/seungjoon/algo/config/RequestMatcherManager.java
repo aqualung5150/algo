@@ -1,6 +1,6 @@
 package com.seungjoon.algo.config;
 
-import com.seungjoon.algo.user.domain.Role;
+import com.seungjoon.algo.member.domain.Role;
 import jakarta.annotation.Nullable;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -10,7 +10,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.util.List;
 import java.util.Objects;
 
-import static com.seungjoon.algo.user.domain.Role.*;
+import static com.seungjoon.algo.member.domain.Role.*;
 import static org.springframework.http.HttpMethod.*;
 
 public class RequestMatcherManager {
@@ -29,6 +29,7 @@ public class RequestMatcherManager {
 
             //
             req(GET, "/**", null),
+//            req(GET, "/users/*", MEMBER),
 
             //auth
             req(PATCH, "/auth/set-username", USERNAME_UNSET),

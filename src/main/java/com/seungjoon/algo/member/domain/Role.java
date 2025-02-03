@@ -1,4 +1,4 @@
-package com.seungjoon.algo.user.domain;
+package com.seungjoon.algo.member.domain;
 
 public enum Role {
 
