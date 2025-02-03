@@ -23,14 +23,4 @@ public class UserController {
     public User getUser(@PathVariable long id) {
         return userRepository.findById(id).orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER));
     }
-
-    @PostMapping
-    public UserResponse createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
-
-        System.out.println(createUserRequest);
-
-        User user = userService.create(createUserRequest);
-
-        return new UserResponse(user);
-    }
 }

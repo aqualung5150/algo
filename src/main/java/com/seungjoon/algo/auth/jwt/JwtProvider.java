@@ -1,5 +1,7 @@
 package com.seungjoon.algo.auth.jwt;
 
+import com.seungjoon.algo.exception.ExceptionCode;
+import com.seungjoon.algo.exception.MissingJwtTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -37,6 +39,11 @@ public class JwtProvider {
     }
 
     private Claims parseClaims(JwtType type, String token) {
+
+        if (token == null) {
+            throw new MissingJwtTokenException(ExceptionCode.MISSING_JWT_TOKEN);
+        }
+
         SecretKey secretKey = getSecretKey(type);
         JwtParser jwtParser = Jwts.parser().verifyWith(secretKey).build();
         return jwtParser.parseSignedClaims(token).getPayload();

@@ -58,14 +58,12 @@ public class AuthController {
             HttpServletResponse response
     ) {
 
-        if (refreshToken == null) {
-            throw new MissingJwtTokenException(ExceptionCode.MISSING_JWT_TOKEN);
-        }
-
-        Long id = jwtProvider.getId(REFRESH, refreshToken);
-        String role = jwtProvider.getRole(REFRESH, refreshToken);
-
-        String accessToken = jwtProvider.generateToken(ACCESS, id, role, 10 * 60 * 1000L);
+        String accessToken = jwtProvider.generateToken(
+                ACCESS,
+                jwtProvider.getId(REFRESH, refreshToken),
+                jwtProvider.getRole(REFRESH, refreshToken),
+                10 * 60 * 1000L
+        );
 
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
 
