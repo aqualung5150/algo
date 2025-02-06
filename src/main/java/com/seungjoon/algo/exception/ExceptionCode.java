@@ -19,7 +19,9 @@ public enum ExceptionCode {
     LOGIN_FAILED(1007, "로그인에 실패했습니다."),
     EXISTING_NORMAL_MEMBER(1008, "이미 가입한 일반계정이 있습니다."),
     EXISTING_GOOGLE_MEMBER(1009, "이미 Google로 가입한 계정이 있습니다."),
-    EXISTING_NAVER_MEMBER(1010, "이미 Naver로 가입한 계정이 있습니다.");
+    EXISTING_NAVER_MEMBER(1010, "이미 Naver로 가입한 계정이 있습니다."),
+
+    NOT_FOUND_POST(1011, "존재하지 않는 게시글입니다.");
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");
 
 //    NOT_FOUND(1005, "요청한 페이지를 찾을 수 없습니다.")
