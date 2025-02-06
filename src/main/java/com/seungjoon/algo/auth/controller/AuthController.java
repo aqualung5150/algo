@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.Map;
 
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
@@ -55,7 +54,6 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<Void> reissue(
-            @AuthenticationPrincipal PrincipalDetails principal,
             @CookieValue(value = "refresh_token", required = false) String refreshToken,
             HttpServletResponse response
     ) {
