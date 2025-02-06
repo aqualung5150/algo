@@ -6,14 +6,15 @@ import com.seungjoon.algo.auth.jwt.JwtProvider;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.auth.service.AuthService;
 import com.seungjoon.algo.member.domain.Member;
-import com.seungjoon.algo.member.dto.MemberResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Map;
 
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
@@ -23,6 +24,8 @@ import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final String REDIRECT_URL = "redirectUrl";
 
     private final AuthService authService;
     private final JwtProvider jwtProvider;
@@ -37,20 +40,21 @@ public class AuthController {
 
         Member member = authService.setUsername(principal.getId(), setUsernameRequest);
 
-        //redirectUrl 세션 삭제
-        request.getSession().removeAttribute("redirectUrl");
-
         //토큰 발급
         String accessToken = jwtProvider.generateToken(ACCESS, member.getId(), member.getRole().name(), 10 * 60 * 1000L);
         String refreshToken = jwtProvider.generateToken(REFRESH, member.getId(), member.getRole().name(), 10 * 60 * 1000L);
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
         response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
 
-        return Map.of("message", "new token generated");
+        //redirectUrl
+        String redirectUrl = request.getSession().getAttribute(REDIRECT_URL).toString();
+        request.getSession().removeAttribute(REDIRECT_URL);
+
+        return Map.of("message", "success", "redirectUrl", redirectUrl);
     }
 
     @PostMapping("/reissue")
-    public Map<String, String> reissue(
+    public ResponseEntity<Void> reissue(
             @AuthenticationPrincipal PrincipalDetails principal,
             @CookieValue(value = "refresh_token", required = false) String refreshToken,
             HttpServletResponse response
@@ -65,13 +69,13 @@ public class AuthController {
 
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
 
-        return Map.of("message", "token reissued");
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/signup")
-    public MemberResponse signup(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public Map<String, String> signup(@Valid @RequestBody SignUpRequest signUpRequest) {
 
         Member member = authService.signUp(signUpRequest);
-        return new MemberResponse(member);
+        return Map.of("message", "new user created");
     }
 }

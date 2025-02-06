@@ -29,7 +29,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        // 로그인 성공 시 브라우저 쿠키 삭제
+        // redirectUrl 쿠키 삭제
         Cookie cookie = new Cookie(REDIRECT_URL, null);
         cookie.setDomain("localhost");
         cookie.setPath("/");
@@ -59,6 +59,5 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             response.sendRedirect(redirectUrl);
             request.getSession().removeAttribute(REDIRECT_URL);
         }
-
     }
 }
