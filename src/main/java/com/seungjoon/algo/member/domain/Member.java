@@ -26,11 +26,14 @@ public class Member {
 
     private String imageUrl;
 
-    String authType;
+    @Column(nullable = false)
+    private String authType;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberState state;
 
@@ -40,7 +43,7 @@ public class Member {
     }
 
     @Builder
-    public Member(String email, String username, String password, String imageUrl, String authType, Role role, MemberState state) {
+    private Member(String email, String username, String password, String imageUrl, String authType, Role role, MemberState state) {
         this.email = email;
         this.username = username;
         this.password = password;
