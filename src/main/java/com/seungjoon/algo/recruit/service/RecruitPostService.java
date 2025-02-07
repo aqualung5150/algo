@@ -14,6 +14,7 @@ import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +33,9 @@ public class RecruitPostService {
     private final StudyRuleRepository studyRuleRepository;
     private final MemberRepository memberRepository;
 
-    //TODO - pageable 어노테이션으로 인자 받기
-    public RecruitPostListResponse getList(int pageNumber, int pageSize) {
+    public RecruitPostListResponse getList(Pageable pageable) {
 
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by("id"));
-        Page<RecruitPost> list = recruitPostRepository.findAll(pageRequest);
+        Page<RecruitPost> list = recruitPostRepository.findAll(pageable);
         long totalElements = list.getTotalElements();
 
         return RecruitPostListResponse.builder()
