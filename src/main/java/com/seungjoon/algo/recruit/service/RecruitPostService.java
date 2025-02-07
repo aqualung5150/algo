@@ -6,10 +6,15 @@ import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
+import com.seungjoon.algo.recruit.dto.RecruitPostListResponse;
+import com.seungjoon.algo.recruit.dto.RecruitPostResponse;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +32,20 @@ public class RecruitPostService {
     private final StudyRuleRepository studyRuleRepository;
     private final MemberRepository memberRepository;
 
-    //TODO - DTO
-//    public List<RecruitPost> findAll() {
-//        return recruitPostRepository.findAll();
-//    }
+    //TODO - pageable 어노테이션으로 인자 받기
+    public RecruitPostListResponse getList(int pageNumber, int pageSize) {
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by("id"));
+        Page<RecruitPost> list = recruitPostRepository.findAll(pageRequest);
+        long totalElements = list.getTotalElements();
+
+        return RecruitPostListResponse.builder()
+                .totalElements(totalElements)
+                .posts(list.getContent().stream()
+                        .map(RecruitPostResponse::from)
+                        .toList())
+                .build();
+    }
 
     @Transactional
     public RecruitPost create(Long memberId, CreateRecruitPostRequest request) {

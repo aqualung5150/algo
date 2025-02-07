@@ -6,9 +6,11 @@ import com.seungjoon.algo.study.dto.StudyRuleResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString
 public class RecruitPostResponse {
 
     private Long id;
