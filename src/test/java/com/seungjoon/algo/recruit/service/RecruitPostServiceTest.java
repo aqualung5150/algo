@@ -13,6 +13,8 @@ import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
@@ -40,8 +42,10 @@ class RecruitPostServiceTest {
         //given - RecruitPost 30개
         saveList();
         //when
-        RecruitPostListResponse page1 = recruitPostService.getList(0, 20);
-        RecruitPostListResponse page2 = recruitPostService.getList(1, 20);
+        PageRequest pageRequest1 = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
+        PageRequest pageRequest2 = PageRequest.of(1, 20, Sort.by(Sort.Direction.DESC, "id"));
+        RecruitPostListResponse page1 = recruitPostService.getList(pageRequest1);
+        RecruitPostListResponse page2 = recruitPostService.getList(pageRequest2);
 
         //then
         List<RecruitPostResponse> posts1 = page1.getPosts();
@@ -52,9 +56,11 @@ class RecruitPostServiceTest {
         assertThat(page2.getTotalElements()).isEqualTo(30L);
         assertThat(posts2.size()).isEqualTo(10);
 
-        assertThat(posts1.get(0).getTitle()).isEqualTo("title1");
-        assertThat(posts2.get(0).getTitle()).isEqualTo("title21");
-        assertThat(posts2.get(posts2.size() - 1).getTitle()).isEqualTo("title30");
+        assertThat(posts1.get(0).getTitle()).isEqualTo("title30");
+        assertThat(posts1.get(posts1.size() - 1).getTitle()).isEqualTo("title11");
+
+        assertThat(posts2.get(0).getTitle()).isEqualTo("title10");
+        assertThat(posts2.get(posts2.size() - 1).getTitle()).isEqualTo("title1");
     }
 
     private void saveList() {
