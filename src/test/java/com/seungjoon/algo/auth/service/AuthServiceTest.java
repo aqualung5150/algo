@@ -5,15 +5,13 @@ import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.ExistingAuthTypeException;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowableOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -60,11 +58,10 @@ class AuthServiceTest {
 
 
         //then
-        BadRequestException ex = catchThrowableOfType(
-                BadRequestException.class,
-                () -> authService.signUp(user2)
-        );
-        assertThat(ex.getCode()).isEqualTo(1006);
+        assertThatThrownBy(() -> authService.signUp(user2))
+                .isInstanceOf(BadRequestException.class)
+                .extracting("code")
+                .isEqualTo(1006);
     }
 
     @Test
@@ -85,10 +82,9 @@ class AuthServiceTest {
 
 
         //then
-        ExistingAuthTypeException ex = catchThrowableOfType(
-                ExistingAuthTypeException.class,
-                () -> authService.signUp(user2)
-        );
-        assertThat(ex.getCode()).isEqualTo(1008);
+        assertThatThrownBy(() -> authService.signUp(user2))
+                .isInstanceOf(ExistingAuthTypeException.class)
+                .extracting("code")
+                .isEqualTo(1008);
     }
 }
