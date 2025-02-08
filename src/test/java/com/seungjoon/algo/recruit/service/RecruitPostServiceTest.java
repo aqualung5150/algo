@@ -1,69 +1,101 @@
 package com.seungjoon.algo.recruit.service;
 
+import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.domain.MemberState;
 import com.seungjoon.algo.member.domain.Role;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
-import com.seungjoon.algo.recruit.dto.RecruitPostListResponse;
-import com.seungjoon.algo.recruit.dto.RecruitPostResponse;
+import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
-import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @Transactional
+@MockitoSettings(strictness = Strictness.LENIENT)
 class RecruitPostServiceTest {
 
-    @Autowired
+    @InjectMocks
     private RecruitPostService recruitPostService;
-    @Autowired
+
+    @Mock
     private RecruitPostRepository recruitPostRepository;
-    @Autowired
+    @Mock
+    private ApplicantRepository applicantRepository;
+    @Mock
     private MemberRepository memberRepository;
-    @Autowired
-    private StudyRuleRepository studyRuleRepository;
+
 
     @Test
-    void list() {
+    void sameAuthorAndApplicant() {
+        //given
+        Member author = member(1L);
+        RecruitPost post = recruitPost(1L, author);
+        given(recruitPostRepository.findById(post.getId()))
+                .willReturn(Optional.of(post));
+        given(memberRepository.findById(author.getId()))
+                .willReturn(Optional.of(author));
 
-        //given - RecruitPost 30개
-        saveList();
+        given(recruitPostRepository.findById(post.getId()))
+                .willReturn(Optional.of(post));
+
+        given(memberRepository.findById(author.getId()))
+                .willReturn(Optional.of(author));
+
         //when
-        PageRequest pageRequest1 = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
-        PageRequest pageRequest2 = PageRequest.of(1, 20, Sort.by(Sort.Direction.DESC, "id"));
-        RecruitPostListResponse page1 = recruitPostService.getList(pageRequest1);
-        RecruitPostListResponse page2 = recruitPostService.getList(pageRequest2);
 
         //then
-        List<RecruitPostResponse> posts1 = page1.getPosts();
-        assertThat(page1.getTotalElements()).isEqualTo(30L);
-        assertThat(posts1.size()).isEqualTo(20);
-
-        List<RecruitPostResponse> posts2 = page2.getPosts();
-        assertThat(page2.getTotalElements()).isEqualTo(30L);
-        assertThat(posts2.size()).isEqualTo(10);
-
-        assertThat(posts1.get(0).getTitle()).isEqualTo("title30");
-        assertThat(posts1.get(posts1.size() - 1).getTitle()).isEqualTo("title11");
-
-        assertThat(posts2.get(0).getTitle()).isEqualTo("title10");
-        assertThat(posts2.get(posts2.size() - 1).getTitle()).isEqualTo("title1");
+        assertThatThrownBy(() -> recruitPostService.createApplicant(post.getId(), author.getId()))
+                .isInstanceOf(BadRequestException.class)
+                .extracting("code")
+                .isEqualTo(1013);
     }
 
-    private void saveList() {
+    @Test
+    void duplicateApplicant() {
+        //given
+        Member author = member(1L);
+        RecruitPost post = recruitPost(1L, author);
+        Member applicant = member(2L);
+
+        given(recruitPostRepository.findById(post.getId()))
+                .willReturn(Optional.of(post));
+        given(memberRepository.findById(author.getId()))
+                .willReturn(Optional.of(author));
+        given(memberRepository.findById(applicant.getId()))
+                .willReturn(Optional.of(applicant));
+        given(applicantRepository.existsByRecruitPostIdAndMemberId(post.getId(), applicant.getId()))
+                .willReturn(false)
+                .willReturn(true);
+
+        //when
+
+        //then
+        recruitPostService.createApplicant(post.getId(), applicant.getId());
+
+        assertThatThrownBy(() -> recruitPostService.createApplicant(post.getId(), applicant.getId()))
+                .isInstanceOf(BadRequestException.class)
+                .extracting("code")
+                .isEqualTo(1012);
+    }
+
+    private Member member(Long id) {
         Member member = Member.builder()
                 .email("test@test.com")
                 .username("test")
@@ -71,32 +103,29 @@ class RecruitPostServiceTest {
                 .state(MemberState.ACTIVE)
                 .authType("normal")
                 .build();
-        memberRepository.save(member);
 
-        List<StudyRule> studyRules = new ArrayList<>();
-        for (int i = 1; i <= 30; ++i) {
-            studyRules.add(
-                    StudyRule.builder()
-                            .submitPerWeek(10)
-                            .totalWeek(5)
-                            .submitDayOfWeek(DayOfWeek.FRIDAY)
-                            .build()
-            );
-        }
-        studyRuleRepository.saveAll(studyRules);
+        ReflectionTestUtils.setField(member, "id", id);
 
-        List<RecruitPost> recruitPosts = new ArrayList<>();
-        for (int i = 1; i <= 30; ++i) {
-            StudyRule studyRule = studyRules.get(i - 1);
-            recruitPosts.add(
-                    RecruitPost.builder()
-                            .title("title" + i)
-                            .content("content" + i)
-                            .member(member)
-                            .studyRule(studyRule)
-                            .build()
-            );
-        }
-        recruitPostRepository.saveAll(recruitPosts);
+        return member;
+    }
+
+    private RecruitPost recruitPost(Long id, Member member) {
+
+        StudyRule studyRule = StudyRule.builder()
+                .submitPerWeek(10)
+                .totalWeek(5)
+                .submitDayOfWeek(DayOfWeek.FRIDAY)
+                .build();
+
+        RecruitPost post = RecruitPost.builder()
+                .title("title")
+                .content("content")
+                .member(member)
+                .studyRule(studyRule)
+                .build();
+
+        ReflectionTestUtils.setField(post, "id", id);
+
+        return post;
     }
 }
