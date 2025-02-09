@@ -73,7 +73,7 @@ public class AuthController {
     @PostMapping("/signup")
     public Map<String, String> signup(@Valid @RequestBody SignUpRequest signUpRequest) {
 
-        Member member = authService.signUp(signUpRequest);
+        authService.signUp(signUpRequest);
         return Map.of("message", "new user created");
     }
 }

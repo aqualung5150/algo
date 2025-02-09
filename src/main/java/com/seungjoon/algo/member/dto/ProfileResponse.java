@@ -6,15 +6,15 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AuthorResponse {
+public class ProfileResponse {
 
     private Long id;
     private String email;
     private String username;
     private String imageUrl;
 
-    public static AuthorResponse from(Member member) {
-        return new AuthorResponse(
+    public static ProfileResponse from(Member member) {
+        return new ProfileResponse(
                 member.getId(),
                 member.getEmail(),
                 member.getUsername(),
