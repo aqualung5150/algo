@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 /* SecurityFilter의 기본값이 세팅됨 */
@@ -36,12 +37,12 @@ class RecruitPostControllerTest {
     @WithMockMember
     void createRecruitPost() throws Exception {
         //given
-        given(recruitPostService.createRecruitPost(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CreateRecruitPostRequest.class)))
+        given(recruitPostService.createRecruitPost(anyLong(), any(CreateRecruitPostRequest.class)))
                 .willReturn(1L);
         //when
         CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(1L, "anyTitle", "anyContent", 1, "FRIDAY", 2);
         ResultActions actions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/recruit-post")
+                MockMvcRequestBuilders.post("/recruit-posts")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRecruitPostRequest))
@@ -50,6 +51,16 @@ class RecruitPostControllerTest {
         //then
         actions
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, "/recruit-post/1"));
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, "/recruit-posts/1"));
+    }
+
+    @Test
+    void createApplicant() {
+        //given
+//        given(recruitPostService.createApplicant(anyLong(), anyLong()))
+//                .willReturn()
+        //when
+
+        //then
     }
 }

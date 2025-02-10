@@ -1,15 +1,18 @@
 package com.seungjoon.algo.recruit.domain;
 
+import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @IdClass(ApplicantId.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Applicant {
+@Getter
+public class Applicant extends BaseEntity {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)

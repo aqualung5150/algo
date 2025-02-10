@@ -21,7 +21,11 @@ public enum ExceptionCode {
     EXISTING_GOOGLE_MEMBER(1009, "이미 Google로 가입한 계정이 있습니다."),
     EXISTING_NAVER_MEMBER(1010, "이미 Naver로 가입한 계정이 있습니다."),
 
-    NOT_FOUND_POST(1011, "존재하지 않는 게시글입니다.");
+    NOT_FOUND_POST(1011, "존재하지 않는 게시글입니다."),
+    DUPLICATE_APPLICANT(1012, "이미 지원한 모집글입니다."),
+    SAME_AUTHOR_APPLICANT(1013, "자신의 모집글에 지원할 수 없습니다."),
+    NOT_FOUND_APPLICANT(1014, "해당 모집글에 지원하지 않았습니다."),
+    NOT_OWN_RESOURCE(1015, "해당 자원의 소유자가 아닙니다.");
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");
 
 //    NOT_FOUND(1005, "요청한 페이지를 찾을 수 없습니다.")
