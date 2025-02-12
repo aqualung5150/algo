@@ -64,7 +64,7 @@ public class RecruitPostController {
     }
 
     @GetMapping("{postId}/applicants")
-    public ResponseEntity<ApplicantProfileSliceResponse> getApplicantList(
+    public ResponseEntity<ApplicantProfileSliceResponse> getApplicants(
             @PathVariable Long postId,
             @PageableDefault(size = 20, sort = "createdDate", direction = ASC) Pageable pageable
     ) {

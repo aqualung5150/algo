@@ -13,6 +13,7 @@ import com.seungjoon.algo.recruit.dto.RecruitPostResponse;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
+import com.seungjoon.algo.study.domain.StudyRuleTag;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,10 +45,13 @@ public class RecruitPostService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
+        //TODO: studyRuleTagRepository.createStudyRuleTag()
+
         StudyRule studyRule = studyRuleRepository.save(StudyRule.builder()
                 .submitDayOfWeek(DayOfWeek.valueOf(request.getSubmitDayOfWeek()))
                 .totalWeek(request.getTotalWeek())
                 .submitPerWeek(request.getSubmitPerWeek())
+//                        .studyRuleTags(studyRuleTags) //TODO
                 .build()
         );
 
