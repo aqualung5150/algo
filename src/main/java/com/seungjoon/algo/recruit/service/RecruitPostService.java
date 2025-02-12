@@ -15,6 +15,9 @@ import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.domain.StudyRuleTag;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
+import com.seungjoon.algo.study.repository.StudyRuleTagRepository;
+import com.seungjoon.algo.subject.domain.Tag;
+import com.seungjoon.algo.subject.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
@@ -37,6 +41,8 @@ public class RecruitPostService {
     private final RecruitPostRepository recruitPostRepository;
     private final ApplicantRepository applicantRepository;
     private final StudyRuleRepository studyRuleRepository;
+    private final TagRepository tagRepository;
+    private final StudyRuleTagRepository studyRuleTagRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -45,15 +51,21 @@ public class RecruitPostService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
-        //TODO: studyRuleTagRepository.createStudyRuleTag()
+        List<Tag> tags = tagRepository.findByIdIn(request.getTags());
+
+        if (tags.size() != request.getTags().size()) {
+            throw new BadRequestException(INVALID_TAGS);
+        }
 
         StudyRule studyRule = studyRuleRepository.save(StudyRule.builder()
-                .submitDayOfWeek(DayOfWeek.valueOf(request.getSubmitDayOfWeek()))
-                .totalWeek(request.getTotalWeek())
-                .submitPerWeek(request.getSubmitPerWeek())
-//                        .studyRuleTags(studyRuleTags) //TODO
-                .build()
+                        .submitDayOfWeek(DayOfWeek.valueOf(request.getSubmitDayOfWeek()))
+                        .totalWeek(request.getTotalWeek())
+                        .submitPerWeek(request.getSubmitPerWeek())
+                        .build()
         );
+
+        List<StudyRuleTag> studyRuleTags = StudyRuleTag.toListFromTags(studyRule, tags);
+        studyRule.addStudyRuleTags(studyRuleTags);
 
         RecruitPost saved = recruitPostRepository.save(RecruitPost.builder()
                 .title(request.getTitle())
@@ -107,7 +119,8 @@ public class RecruitPostService {
     }
 
     public RecruitPost getRecruitPostById(Long id) {
-        return recruitPostRepository.findById(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+        //TODO: N + 1 문제 해결 - RecruitPost의 Member, StudyRule, StudyRuleTag, Tag를 어떻게 가져올 것인가.
+        return recruitPostRepository.findByIdJoinFetchMember(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
     }
 
     public ApplicantProfileSliceResponse getApplicantProfileListByPostId(Long id, Pageable pageable) {

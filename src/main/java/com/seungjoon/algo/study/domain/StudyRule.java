@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,10 +25,17 @@ public class StudyRule {
     private DayOfWeek submitDayOfWeek;
     private int submitPerWeek;
 
+    @OneToMany(mappedBy = "studyRule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudyRuleTag> studyRuleTags = new ArrayList<>();
+
     @Builder
     private StudyRule(int totalWeek, DayOfWeek submitDayOfWeek, int submitPerWeek) {
         this.totalWeek = totalWeek;
         this.submitDayOfWeek = submitDayOfWeek;
         this.submitPerWeek = submitPerWeek;
+    }
+
+    public void addStudyRuleTags(List<StudyRuleTag> studyRuleTags) {
+        this.studyRuleTags.addAll(studyRuleTags);
     }
 }

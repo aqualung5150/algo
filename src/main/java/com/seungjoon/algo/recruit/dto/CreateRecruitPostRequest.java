@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 public class CreateRecruitPostRequest {
@@ -26,4 +28,7 @@ public class CreateRecruitPostRequest {
     private String submitDayOfWeek;
     @NotNull
     private Integer submitPerWeek;
+
+    @NotNull
+    private List<Long> tags;
 }
