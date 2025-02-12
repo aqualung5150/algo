@@ -1,6 +1,8 @@
 package com.seungjoon.algo.recruit.repository;
 
 import com.seungjoon.algo.recruit.domain.RecruitPost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -8,6 +10,15 @@ import java.util.Optional;
 
 public interface RecruitPostRepository extends JpaRepository<RecruitPost, Long> {
 
-    @Query("select r from RecruitPost r join fetch r.member where r.id = :id")
-    Optional<RecruitPost> findByIdJoinFetchMember(Long id);
+    @Query("select r from RecruitPost r" +
+            " join fetch r.member" +
+            " join fetch r.studyRule" +
+//            " join fetch s.studyRuleTags" +
+            " where r.id = :id")
+    Optional<RecruitPost> findByIdJoinFetch(Long id);
+
+    @Query("select r from RecruitPost r" +
+            " join fetch r.member" +
+            " join fetch r.studyRule")
+    Page<RecruitPost> findAllJoinFetch(Pageable pageable);
 }

@@ -106,8 +106,9 @@ public class RecruitPostService {
     }
 
     public RecruitPostPageResponse getRecruitPostList(Pageable pageable) {
-
-        Page<RecruitPost> list = recruitPostRepository.findAll(pageable);
+        //TODO: 블로그 - N + 1해결
+        Page<RecruitPost> list = recruitPostRepository.findAllJoinFetch(pageable);
+//        Page<RecruitPost> list = recruitPostRepository.findAll(pageable);
         long totalCount = list.getTotalElements();
 
         return RecruitPostPageResponse.of(
@@ -120,7 +121,8 @@ public class RecruitPostService {
 
     public RecruitPost getRecruitPostById(Long id) {
         //TODO: N + 1 문제 해결 - RecruitPost의 Member, StudyRule, StudyRuleTag, Tag를 어떻게 가져올 것인가.
-        return recruitPostRepository.findByIdJoinFetchMember(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+        return recruitPostRepository.findByIdJoinFetch(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+//        return recruitPostRepository.findById(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
     }
 
     public ApplicantProfileSliceResponse getApplicantProfileListByPostId(Long id, Pageable pageable) {
