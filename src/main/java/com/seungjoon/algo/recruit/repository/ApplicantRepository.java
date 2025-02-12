@@ -1,13 +1,12 @@
 package com.seungjoon.algo.recruit.repository;
 
 import com.seungjoon.algo.recruit.domain.Applicant;
-import com.seungjoon.algo.recruit.domain.ApplicantId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface ApplicantRepository extends JpaRepository<Applicant, ApplicantId> {
+public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
 
     boolean existsByRecruitPostIdAndMemberId(Long postId, Long memberId);
 
