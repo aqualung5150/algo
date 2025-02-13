@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
@@ -40,7 +42,7 @@ class RecruitPostControllerTest {
         given(recruitPostService.createRecruitPost(anyLong(), any(CreateRecruitPostRequest.class)))
                 .willReturn(1L);
         //when
-        CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(1L, "anyTitle", "anyContent", 1, "FRIDAY", 2);
+        CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(1L, "anyTitle", "anyContent", 1, "FRIDAY", 2, List.of(1L, 2L));
         ResultActions actions = mockMvc.perform(
                 MockMvcRequestBuilders.post("/recruit-posts")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())

@@ -11,9 +11,4 @@ public class AlgoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AlgoApplication.class, args);
 	}
-
-	@Bean
-	public TestDataInit testDataInit(TagRepository tagRepository) {
-		return new TestDataInit(tagRepository);
-	}
 }

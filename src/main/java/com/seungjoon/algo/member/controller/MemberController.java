@@ -29,6 +29,8 @@ public class MemberController {
         return ResponseEntity.ok(ProfileResponse.from(member));
     }
 
+    //TODO - "{id}/recruit-posts"
+
     @GetMapping("{id}/applications")
     public ResponseEntity<RecruitPostSliceResponse> getApplications(
             @PathVariable Long id,
