@@ -6,10 +6,7 @@ import com.seungjoon.algo.member.dto.ProfileResponse;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
-import com.seungjoon.algo.recruit.dto.ApplicantProfileSliceResponse;
-import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
-import com.seungjoon.algo.recruit.dto.RecruitPostPageResponse;
-import com.seungjoon.algo.recruit.dto.RecruitPostResponse;
+import com.seungjoon.algo.recruit.dto.*;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
@@ -26,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
@@ -105,9 +101,10 @@ public class RecruitPostService {
         }
     }
 
-    public RecruitPostPageResponse getRecruitPostList(Pageable pageable) {
+    public RecruitPostPageResponse getRecruitPostList(RecruitPostSearchCondition condition, Pageable pageable) {
         //TODO: 블로그 - N + 1해결
-        Page<RecruitPost> list = recruitPostRepository.findAllJoinFetch(pageable);
+        Page<RecruitPost> list = recruitPostRepository.findAllJoinFetch(condition, pageable);
+//        Page<RecruitPost> list = recruitPostRepository.findAllJoinFetch(pageable);
 //        Page<RecruitPost> list = recruitPostRepository.findAll(pageable);
         long totalCount = list.getTotalElements();
 

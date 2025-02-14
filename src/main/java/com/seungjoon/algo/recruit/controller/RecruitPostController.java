@@ -2,10 +2,7 @@ package com.seungjoon.algo.recruit.controller;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
-import com.seungjoon.algo.recruit.dto.ApplicantProfileSliceResponse;
-import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
-import com.seungjoon.algo.recruit.dto.RecruitPostPageResponse;
-import com.seungjoon.algo.recruit.dto.RecruitPostResponse;
+import com.seungjoon.algo.recruit.dto.*;
 import com.seungjoon.algo.recruit.service.RecruitPostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +28,11 @@ public class RecruitPostController {
     //TODO - 필터 컨디션: By 내 지원서 등등
     @GetMapping
     public RecruitPostPageResponse getRecruitPosts(
+            @ModelAttribute RecruitPostSearchCondition condition,
             @PageableDefault(size = 20, sort = "id", direction = DESC) Pageable pageable
     ) {
 
-        return recruitPostService.getRecruitPostList(pageable);
+        return recruitPostService.getRecruitPostList(condition, pageable);
     }
 
     @GetMapping("{id}")
