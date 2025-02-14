@@ -29,34 +29,41 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
         this.queryFactory = new JPAQueryFactory(em);
     }
 
+    /*TODO: 역정규화
+       또는
+       (X)GROUP_CONCAT(https://thisiswoo.github.io/development/using-jpa-querydsl-groupconcat-func.html)
+       -> RecruitPost를 객체지향적으로 받고 싶기 때문에 적절하지 않을 수 있음
+       또는
+       StudyRuleTag에 대해 조회?
+     */
     @Override
     public Page<RecruitPost> findAllJoinFetch(RecruitPostSearchCondition condition, Pageable pageable) {
 
-        JPAQuery<Long> orderIdQuery = queryFactory
-                .select(recruitPost.id)
-                .from(recruitPost)
-                .join(recruitPost.studyRule, studyRule)
-                .join(studyRule.studyRuleTags, studyRuleTag)
+        //TODO: join 동적으로 하기
+        List<Long> studyRuleIds = queryFactory
+                .select(studyRuleTag.studyRule.id)
+                .from(studyRuleTag)
                 .join(studyRuleTag.tag, tag)
                 .where(tagIn(condition.getTag()))
-                .distinct();
+                .distinct()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         List<RecruitPost> posts = queryFactory
                 .selectFrom(recruitPost)
-                .join(recruitPost.studyRule).fetchJoin()
+                .join(recruitPost.studyRule, studyRule).fetchJoin()
                 .join(recruitPost.member).fetchJoin()
-                .where(recruitPost.id.in(orderIdQuery
-                                .offset(pageable.getOffset())
-                                .limit(pageable.getPageSize())),
-                        titleContainsIgnoreCase(condition.getTitle()))
+                .where(
+                        studyRule.id.in(studyRuleIds),
+                        titleContainsIgnoreCase(condition.getTitle())
+                )
                 .orderBy(recruitPost.id.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
-                .select(recruitPost.countDistinct())
-                .from(recruitPost)
-                .join(recruitPost.studyRule, studyRule)
-                .join(studyRule.studyRuleTags, studyRuleTag)
+                .select(studyRuleTag.studyRule.countDistinct())
+                .from(studyRuleTag)
                 .join(studyRuleTag.tag, tag)
                 .where(tagIn(condition.getTag()));
 
