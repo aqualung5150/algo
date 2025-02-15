@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -103,14 +104,20 @@ public class RecruitPostService {
 
     public RecruitPostPageResponse getRecruitPostList(RecruitPostSearchCondition condition, Pageable pageable) {
         //TODO: 블로그 - N + 1해결
-        Page<RecruitPost> list = recruitPostRepository.findAllJoinFetch(condition, pageable);
+        Page<RecruitPost> posts = null;
+        if (ObjectUtils.isEmpty(condition.getTag())) {
+            posts = recruitPostRepository.findAllJoinFetch(condition, pageable);
+        } else {
+            posts = recruitPostRepository.findAllByTag(condition, pageable);
+        }
+//        Page<RecruitPost> list = recruitPostRepository.findAllByTag(condition, pageable);
 //        Page<RecruitPost> list = recruitPostRepository.findAllJoinFetch(pageable);
 //        Page<RecruitPost> list = recruitPostRepository.findAll(pageable);
-        long totalCount = list.getTotalElements();
+        long totalCount = posts.getTotalElements();
 
         return RecruitPostPageResponse.of(
                 totalCount,
-                list.getContent().stream()
+                posts.getContent().stream()
                         .map(RecruitPostResponse::from)
                         .toList()
         );
