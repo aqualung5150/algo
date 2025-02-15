@@ -1,5 +1,6 @@
 package com.seungjoon.algo.recruit.domain;
 
+import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.study.domain.StudyRule;
 import jakarta.persistence.*;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecruitPost {
+public class RecruitPost extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.dto.RecruitPostSearchCondition;
+import com.seungjoon.algo.utils.QuerydslUtils;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,7 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
                 .join(recruitPost.member).fetchJoin()
                 .join(recruitPost.studyRule).fetchJoin()
                 .where(titleContainsIgnoreCase(condition.getTitle()))
-                .orderBy(recruitPost.id.desc())
+                .orderBy(QuerydslUtils.getSort(pageable, recruitPost))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -76,7 +77,7 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
                         studyRule.id.in(studyRuleIdsQuery),
                         titleContainsIgnoreCase(condition.getTitle())
                 )
-                .orderBy(recruitPost.id.desc())
+                .orderBy(QuerydslUtils.getSort(pageable, recruitPost))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

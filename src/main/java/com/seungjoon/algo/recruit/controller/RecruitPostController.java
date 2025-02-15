@@ -25,11 +25,10 @@ public class RecruitPostController {
 
     private final RecruitPostService recruitPostService;
 
-    //TODO - 필터 컨디션: By 내 지원서 등등
     @GetMapping
     public RecruitPostPageResponse getRecruitPosts(
             @ModelAttribute RecruitPostSearchCondition condition,
-            @PageableDefault(size = 20, sort = "id", direction = DESC) Pageable pageable
+            @PageableDefault(size = 20, sort = "createdDate", direction = DESC) Pageable pageable
     ) {
 
         return recruitPostService.getRecruitPostList(condition, pageable);
