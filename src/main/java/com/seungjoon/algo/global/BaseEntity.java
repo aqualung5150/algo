@@ -2,6 +2,7 @@ package com.seungjoon.algo.global;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,15 +18,15 @@ public abstract class BaseEntity {
 
     @CreatedBy
     @Column(updatable = false)
-    String createdBy;
+    private String createdBy;
 
     @LastModifiedBy
-    String lastModifiedBy;
+    private String lastModifiedBy;
 
     @CreatedDate
     @Column(updatable = false)
-    LocalDateTime createdDate;
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
-    LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 }
