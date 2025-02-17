@@ -1,11 +1,12 @@
 package com.seungjoon.algo.subject.domain;
 
+import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.study.domain.Study;
 import jakarta.persistence.*;
 
 @Entity
-public class Submission {
+public class Submission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

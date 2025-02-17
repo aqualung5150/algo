@@ -12,9 +12,9 @@ public abstract class QuerydslUtils {
 
         PathBuilder<T> pathBuilder = new PathBuilder<>(qClass.getType(), qClass.getMetadata());
 
-        return pageable.getSort().stream().map(sort -> new OrderSpecifier<>(
-                            sort.isAscending() ? Order.ASC : Order.DESC,
-                            pathBuilder.getString(sort.getProperty())
+        return pageable.getSort().stream().map(order -> new OrderSpecifier<>(
+                            order.isAscending() ? Order.ASC : Order.DESC,
+                            pathBuilder.getString(order.getProperty())
         )).toArray(OrderSpecifier[]::new);
     }
 }

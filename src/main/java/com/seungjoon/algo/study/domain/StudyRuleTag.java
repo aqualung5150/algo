@@ -1,5 +1,6 @@
 package com.seungjoon.algo.study.domain;
 
+import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.subject.domain.Tag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -12,7 +13,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class StudyRuleTag {
+public class StudyRuleTag extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

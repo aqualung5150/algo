@@ -1,10 +1,11 @@
 package com.seungjoon.algo.study.domain;
 
+import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.member.domain.Member;
 import jakarta.persistence.*;
 
 @Entity
-public class ClosingVote {
+public class ClosingVote extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,11 +1,12 @@
 package com.seungjoon.algo.study.domain;
 
+import com.seungjoon.algo.global.BaseEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-public class Study {
+public class Study extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

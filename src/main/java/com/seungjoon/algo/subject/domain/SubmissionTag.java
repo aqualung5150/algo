@@ -1,9 +1,10 @@
 package com.seungjoon.algo.subject.domain;
 
+import com.seungjoon.algo.global.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
-public class SubmissionTag {
+public class SubmissionTag extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
