@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -23,6 +22,8 @@ public class StudyRule extends BaseEntity {
     private Long id;
 
     private int numberOfMembers;
+    private int minLevel;
+    private int maxLevel;
     private int totalWeek;
     private DayOfWeek submitDayOfWeek;
     private int submitPerWeek;
@@ -31,8 +32,10 @@ public class StudyRule extends BaseEntity {
     private List<StudyRuleTag> studyRuleTags = new ArrayList<>();
 
     @Builder
-    private StudyRule(int numberOfMembers, int totalWeek, DayOfWeek submitDayOfWeek, int submitPerWeek) {
+    private StudyRule(int numberOfMembers, int minLevel, int maxLevel, int totalWeek, DayOfWeek submitDayOfWeek, int submitPerWeek) {
         this.numberOfMembers = numberOfMembers;
+        this.minLevel = minLevel;
+        this.maxLevel = maxLevel;
         this.totalWeek = totalWeek;
         this.submitDayOfWeek = submitDayOfWeek;
         this.submitPerWeek = submitPerWeek;

@@ -9,4 +9,6 @@ public class RecruitPostSearchCondition {
 
     private String title;
     private List<Long> tag;
+    private Integer minLevel;
+    private Integer maxLevel;
 }

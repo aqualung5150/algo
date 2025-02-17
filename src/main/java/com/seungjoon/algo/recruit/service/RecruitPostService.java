@@ -21,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -56,6 +55,8 @@ public class RecruitPostService {
 
         StudyRule studyRule = studyRuleRepository.save(StudyRule.builder()
                         .numberOfMembers(request.getNumberOfMembers())
+                        .minLevel(request.getMinLevel())
+                        .maxLevel(request.getMaxLevel())
                         .submitDayOfWeek(DayOfWeek.valueOf(request.getSubmitDayOfWeek()))
                         .totalWeek(request.getTotalWeek())
                         .submitPerWeek(request.getSubmitPerWeek())
@@ -103,14 +104,12 @@ public class RecruitPostService {
         }
     }
 
-    public RecruitPostPageResponse getRecruitPostList(RecruitPostSearchCondition condition, Pageable pageable) {
+    public RecruitPostPageResponse getRecruitPostList(
+            RecruitPostSearchCondition condition,
+            Pageable pageable
+    ) {
 
-        Page<RecruitPost> posts = null;
-        if (ObjectUtils.isEmpty(condition.getTag())) {
-            posts = recruitPostRepository.findAllJoinFetch(condition, pageable);
-        } else {
-            posts = recruitPostRepository.findAllByTag(condition, pageable);
-        }
+        Page<RecruitPost> posts = recruitPostRepository.findAllByCondition(condition, pageable);
 
         long totalCount = posts.getTotalElements();
 

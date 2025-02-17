@@ -30,27 +30,6 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-    @Override
-    public Page<RecruitPost> findAllJoinFetch(RecruitPostSearchCondition condition, Pageable pageable) {
-
-        List<RecruitPost> posts = queryFactory
-                .selectFrom(recruitPost)
-                .join(recruitPost.member).fetchJoin()
-                .join(recruitPost.studyRule).fetchJoin()
-                .where(titleContainsIgnoreCase(condition.getTitle()))
-                .orderBy(QuerydslUtils.getSort(pageable, recruitPost))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        JPAQuery<Long> countQuery = queryFactory
-                .select(recruitPost.count())
-                .from(recruitPost)
-                .where(titleContainsIgnoreCase(condition.getTitle()));
-
-        return PageableExecutionUtils.getPage(posts, pageable, countQuery::fetchOne);
-    }
-
     /*TODO: 역정규화
            또는
            (X)GROUP_CONCAT(https://thisiswoo.github.io/development/using-jpa-querydsl-groupconcat-func.html)
@@ -59,23 +38,17 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
            StudyRuleTag에 대해 조회?
          */
     @Override
-    public Page<RecruitPost> findAllByTag(RecruitPostSearchCondition condition, Pageable pageable) {
+    public Page<RecruitPost> findAllByCondition(RecruitPostSearchCondition condition, Pageable pageable) {
 
-        JPAQuery<Long> studyRuleIdsQuery = queryFactory
-                .select(studyRuleTag.studyRule.id)
-                .from(studyRuleTag)
-                .join(studyRuleTag.tag, tag)
-                .where(tagIn(condition.getTag()))
-                .distinct();
-
-        // where문 안에서 서브쿼리 성능 테스트
         List<RecruitPost> posts = queryFactory
                 .selectFrom(recruitPost)
                 .join(recruitPost.studyRule, studyRule).fetchJoin()
                 .join(recruitPost.member).fetchJoin()
                 .where(
-                        studyRule.id.in(studyRuleIdsQuery),
-                        titleContainsIgnoreCase(condition.getTitle())
+                        studyRuleInByTag(condition.getTag()),
+                        minLevelGoe(condition.getMinLevel()),
+                        maxLevelLoe(condition.getMaxLevel()),
+                        titleContains(condition.getTitle())
                 )
                 .orderBy(QuerydslUtils.getSort(pageable, recruitPost))
                 .offset(pageable.getOffset())
@@ -84,21 +57,59 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(recruitPost.countDistinct())
-                .from(recruitPost)
-                .join(recruitPost.studyRule, studyRule)
+                .from(recruitPost);
+
+        joinStudyRuleByCondition(countQuery, condition)
                 .where(
-                        studyRule.id.in(studyRuleIdsQuery),
-                        titleContainsIgnoreCase(condition.getTitle())
+                        studyRuleInByTag(condition.getTag()),
+                        minLevelGoe(condition.getMinLevel()),
+                        maxLevelLoe(condition.getMaxLevel()),
+                        titleContains(condition.getTitle())
                 );
 
         return PageableExecutionUtils.getPage(posts, pageable, countQuery::fetchOne);
     }
 
-    private BooleanExpression tagIn(List<Long> tagIds) {
-        return !ObjectUtils.isEmpty(tagIds) ? tag.id.in(tagIds) : null;
+    private BooleanExpression studyRuleInByTag(List<Long> tagIds) {
+
+        if (ObjectUtils.isEmpty(tagIds)) {
+            return null;
+        }
+
+        JPAQuery<Long> studyRuleIdsByTagQuery = queryFactory
+                .select(studyRuleTag.studyRule.id)
+                .from(studyRuleTag)
+                .join(studyRuleTag.tag, tag)
+                .where(tag.id.in(tagIds))
+                .distinct();
+
+        return studyRule.id.in(studyRuleIdsByTagQuery);
     }
 
-    private BooleanExpression titleContainsIgnoreCase(String title) {
+    private BooleanExpression minLevelGoe(Integer level) {
+        return level != null ? studyRule.minLevel.goe(level) : null;
+    }
+
+    private BooleanExpression maxLevelLoe(Integer level) {
+        return level != null ? studyRule.maxLevel.loe(level) : null;
+    }
+
+    private BooleanExpression titleContains(String title) {
         return StringUtils.hasText(title) ? recruitPost.title.containsIgnoreCase(title) : null;
+    }
+
+    private JPAQuery<Long> joinStudyRuleByCondition(
+            JPAQuery<Long> countQuery,
+            RecruitPostSearchCondition condition
+    ) {
+        if (
+                condition.getMaxLevel() != null ||
+                condition.getMinLevel() != null ||
+                !ObjectUtils.isEmpty(condition.getTag())
+        ) {
+            countQuery = countQuery.join(recruitPost.studyRule);
+        }
+
+        return countQuery;
     }
 }

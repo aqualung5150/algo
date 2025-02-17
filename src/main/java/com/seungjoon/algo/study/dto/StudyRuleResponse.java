@@ -15,6 +15,8 @@ import java.util.List;
 public class StudyRuleResponse {
 
     private int numberOfMembers;
+    private int minLevel;
+    private int maxLevel;
     private int totalWeek;
     private String submitDayOfWeek;
     private int submitPerWeek;
@@ -23,6 +25,8 @@ public class StudyRuleResponse {
     public static StudyRuleResponse from(StudyRule studyRule) {
         return new StudyRuleResponse(
                 studyRule.getNumberOfMembers(),
+                studyRule.getMinLevel(),
+                studyRule.getMaxLevel(),
                 studyRule.getTotalWeek(),
                 studyRule.getSubmitDayOfWeek().name(),
                 studyRule.getSubmitPerWeek(),

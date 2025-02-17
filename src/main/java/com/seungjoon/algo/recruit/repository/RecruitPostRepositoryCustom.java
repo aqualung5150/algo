@@ -6,6 +6,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface RecruitPostRepositoryCustom {
-    Page<RecruitPost> findAllJoinFetch(RecruitPostSearchCondition condition, Pageable pageable);
-    Page<RecruitPost> findAllByTag(RecruitPostSearchCondition condition, Pageable pageable);
+    Page<RecruitPost> findAllByCondition(RecruitPostSearchCondition condition, Pageable pageable);
 }
