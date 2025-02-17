@@ -23,6 +23,10 @@ public class CreateRecruitPostRequest {
     @NotNull
     private Integer numberOfMembers;
     @NotNull
+    private Integer minLevel;
+    @NotNull
+    private Integer maxLevel;
+    @NotNull
     private Integer totalWeek;
     @NotBlank
     @Pattern(regexp = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)$",
