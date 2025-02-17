@@ -3,6 +3,7 @@ package com.seungjoon.algo.study.domain;
 import com.seungjoon.algo.global.BaseEntity;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,7 +16,7 @@ public class Study extends BaseEntity {
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
-    private LocalDateTime deadline;
+    private LocalDate deadline;
     private int weekNumber;
 
     @Enumerated(EnumType.STRING)

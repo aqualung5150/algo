@@ -55,6 +55,7 @@ public class RecruitPostService {
         }
 
         StudyRule studyRule = studyRuleRepository.save(StudyRule.builder()
+                        .numberOfMembers(request.getNumberOfMembers())
                         .submitDayOfWeek(DayOfWeek.valueOf(request.getSubmitDayOfWeek()))
                         .totalWeek(request.getTotalWeek())
                         .submitPerWeek(request.getSubmitPerWeek())
@@ -103,16 +104,14 @@ public class RecruitPostService {
     }
 
     public RecruitPostPageResponse getRecruitPostList(RecruitPostSearchCondition condition, Pageable pageable) {
-        //TODO: 블로그 - N + 1해결
+
         Page<RecruitPost> posts = null;
         if (ObjectUtils.isEmpty(condition.getTag())) {
             posts = recruitPostRepository.findAllJoinFetch(condition, pageable);
         } else {
             posts = recruitPostRepository.findAllByTag(condition, pageable);
         }
-//        Page<RecruitPost> list = recruitPostRepository.findAllByTag(condition, pageable);
-//        Page<RecruitPost> list = recruitPostRepository.findAllJoinFetch(pageable);
-//        Page<RecruitPost> list = recruitPostRepository.findAll(pageable);
+
         long totalCount = posts.getTotalElements();
 
         return RecruitPostPageResponse.of(

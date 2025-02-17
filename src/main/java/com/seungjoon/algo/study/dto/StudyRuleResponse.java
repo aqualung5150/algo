@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StudyRuleResponse {
 
+    private int numberOfMembers;
     private int totalWeek;
     private String submitDayOfWeek;
     private int submitPerWeek;
@@ -21,6 +22,7 @@ public class StudyRuleResponse {
 
     public static StudyRuleResponse from(StudyRule studyRule) {
         return new StudyRuleResponse(
+                studyRule.getNumberOfMembers(),
                 studyRule.getTotalWeek(),
                 studyRule.getSubmitDayOfWeek().name(),
                 studyRule.getSubmitPerWeek(),

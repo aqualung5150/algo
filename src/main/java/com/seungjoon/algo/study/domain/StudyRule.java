@@ -22,6 +22,7 @@ public class StudyRule extends BaseEntity {
     @Column(name = "study_rule_id")
     private Long id;
 
+    private int numberOfMembers;
     private int totalWeek;
     private DayOfWeek submitDayOfWeek;
     private int submitPerWeek;
@@ -30,7 +31,8 @@ public class StudyRule extends BaseEntity {
     private List<StudyRuleTag> studyRuleTags = new ArrayList<>();
 
     @Builder
-    private StudyRule(int totalWeek, DayOfWeek submitDayOfWeek, int submitPerWeek) {
+    private StudyRule(int numberOfMembers, int totalWeek, DayOfWeek submitDayOfWeek, int submitPerWeek) {
+        this.numberOfMembers = numberOfMembers;
         this.totalWeek = totalWeek;
         this.submitDayOfWeek = submitDayOfWeek;
         this.submitPerWeek = submitPerWeek;
