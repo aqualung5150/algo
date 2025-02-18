@@ -42,7 +42,17 @@ class RecruitPostControllerTest {
         given(recruitPostService.createRecruitPost(anyLong(), any(CreateRecruitPostRequest.class)))
                 .willReturn(1L);
         //when
-        CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(1L, "anyTitle", "anyContent", 1, "FRIDAY", 2, List.of(1L, 2L));
+        CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(1L,
+                "anyTitle",
+                "anyContent",
+                1,
+                10,
+                15,
+                2,
+                "FRIDAY",
+                2,
+                List.of(1L, 2L)
+        );
         ResultActions actions = mockMvc.perform(
                 MockMvcRequestBuilders.post("/recruit-posts")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())

@@ -8,13 +8,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
-//TODO - WithMockMember
 public class CustomMockUserSecurityContextFactory implements WithSecurityContextFactory<WithMockMember> {
     @Override
     public SecurityContext createSecurityContext(WithMockMember annotation) {
 
         PrincipalDto principalDto = PrincipalDto.builder()
-                .id(1L)
+                .id(Long.parseLong(annotation.id()))
                 .role(annotation.role())
                 .password("1234")
                 .name("test-name")
