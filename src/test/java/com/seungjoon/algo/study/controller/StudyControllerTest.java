@@ -6,10 +6,13 @@ import com.seungjoon.algo.auth.dto.SignUpRequest;
 import com.seungjoon.algo.auth.service.AuthService;
 import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
 import com.seungjoon.algo.recruit.service.RecruitPostService;
+import com.seungjoon.algo.study.domain.Study;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
+import com.seungjoon.algo.study.repository.StudyRepository;
 import com.seungjoon.algo.study.service.StudyService;
 import com.seungjoon.algo.subject.domain.Tag;
 import com.seungjoon.algo.subject.repository.TagRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,6 +30,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.net.URI;
 import java.util.List;
 
 @SpringBootTest
@@ -44,6 +48,8 @@ class StudyControllerTest {
 
     @Autowired
     StudyService studyService;
+    @Autowired
+    StudyRepository studyRepository;
     @Autowired
     RecruitPostService recruitPostService;
     @Autowired
@@ -106,10 +112,13 @@ class StudyControllerTest {
         );
 
         //then
-        actions
+        String location = actions
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, "/study/1"));
+                .andReturn().getResponse().getHeader(HttpHeaders.LOCATION);
+
+        String[] split = location.split("/");
+        Long studyId = Long.valueOf(split[split.length - 1]);
+        Study study = studyRepository.findById(studyId).orElse(null);
+        Assertions.assertThat(study).isNotNull();
     }
-
-
 }
