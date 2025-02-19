@@ -1,17 +1,20 @@
 package com.seungjoon.algo.study.service;
 
 import com.seungjoon.algo.exception.BadRequestException;
+import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.UnauthorizedException;
-import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.*;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
+import com.seungjoon.algo.study.dto.StudyPageResponse;
 import com.seungjoon.algo.study.repository.StudyMemberRepository;
 import com.seungjoon.algo.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,16 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final StudyMemberRepository studyMemberRepository;
 
+    public StudyPageResponse getStudiesByMemberId(Long memberId, Long authId, Pageable pageable) {
+        if (!memberId.equals(authId)) {
+            throw new UnauthorizedException(NOT_OWN_RESOURCE);
+        }
+
+        Page<Study> studies = studyRepository.findByMemberId(memberId, pageable);
+
+        return StudyPageResponse.of(studies.getTotalElements(), studies.getContent());
+    }
+
     @Transactional
     public Long createStudy(Long authId, CreateStudyRequest request) {
 
@@ -45,6 +58,7 @@ public class StudyService {
         validateApplicants(request.getMemberIds(), applicants);
 
         Study study = studyRepository.save(Study.builder()
+                .name(request.getName())
                 .studyRule(post.getStudyRule())
                 .firstSubmitDate(getFirstSubmitDate(studyRule))
                 .lastSubmitDate(getLastSubmitDate(studyRule))

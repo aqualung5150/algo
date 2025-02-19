@@ -1,14 +1,17 @@
 package com.seungjoon.algo.member.controller;
 
+import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.dto.ProfileResponse;
 import com.seungjoon.algo.member.service.MemberService;
-import com.seungjoon.algo.recruit.dto.RecruitPostPageResponse;
 import com.seungjoon.algo.recruit.dto.RecruitPostSliceResponse;
+import com.seungjoon.algo.study.dto.StudyPageResponse;
+import com.seungjoon.algo.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +25,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class MemberController {
 
     private final MemberService memberService;
+    private final StudyService studyService;
 
     @GetMapping("{id}")
     public ResponseEntity<ProfileResponse> getUser(@PathVariable Long id) {
@@ -37,5 +41,16 @@ public class MemberController {
             @PageableDefault(size = 20, sort = "createdDate", direction = DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(memberService.getApplicatedPostList(id, pageable));
+    }
+
+    //TODO: test
+    @GetMapping("{id}/studies")
+    public ResponseEntity<StudyPageResponse> getStudies(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id,
+            @PageableDefault(size = 20, sort = "createdDate", direction = DESC) Pageable pageable
+    ) {
+
+        return ResponseEntity.ok(studyService.getStudiesByMemberId(id, principalDetails.getId(), pageable));
     }
 }
