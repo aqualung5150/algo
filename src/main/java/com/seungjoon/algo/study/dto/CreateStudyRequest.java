@@ -14,5 +14,8 @@ public class CreateStudyRequest {
     private Long recruitPostId;
 
     @NotNull
+    private String name;
+
+    @NotNull
     private List<Long> memberIds;
 }

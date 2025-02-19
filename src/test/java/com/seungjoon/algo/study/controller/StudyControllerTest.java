@@ -101,6 +101,7 @@ class StudyControllerTest {
         //when
         CreateStudyRequest createStudyRequest = new CreateStudyRequest(
                 1L,
+                "study1",
                 List.of(1L, 2L, 3L)
         );
 
