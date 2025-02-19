@@ -31,15 +31,4 @@ public class MemberService {
                 .findById(id)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_MEMBER));
     }
-
-    public RecruitPostSliceResponse getApplicatedPostList(Long id, Pageable pageable) {
-
-        Slice<Applicant> slice = applicantRepository.findAllByMemberIdJoinFetchRecruitPost(id, pageable);
-
-        List<RecruitPostResponse> posts = slice.stream()
-                .map(applicant -> RecruitPostResponse.from(applicant.getRecruitPost()))
-                .toList();
-
-        return RecruitPostSliceResponse.of(slice.hasNext(), posts);
-    }
 }

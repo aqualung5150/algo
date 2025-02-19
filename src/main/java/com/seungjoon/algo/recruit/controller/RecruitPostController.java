@@ -65,7 +65,7 @@ public class RecruitPostController {
             @PathVariable Long postId,
             @PageableDefault(size = 20, sort = "createdDate", direction = ASC) Pageable pageable
     ) {
-        return ResponseEntity.ok(recruitPostService.getApplicantProfileListByPostId(postId, pageable));
+        return ResponseEntity.ok(recruitPostService.getApplications(postId, pageable));
     }
 
     @PostMapping("{postId}/applicants")

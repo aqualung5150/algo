@@ -127,14 +127,15 @@ public class RecruitPostService {
 //        return recruitPostRepository.findById(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
     }
 
-    public ApplicantProfileSliceResponse getApplicantProfileListByPostId(Long id, Pageable pageable) {
-        Slice<Applicant> slice = applicantRepository.findAllByPostIdJoinFetchMember(id, pageable);
+    public ApplicantProfileSliceResponse getApplications(Long postId, Pageable pageable) {
+        Slice<Applicant> slice = applicantRepository.findAllByPostIdJoinFetchMember(postId, pageable);
 
-        List<ProfileResponse> applicants = slice.stream()
-                .map(applicant -> ProfileResponse.from(applicant.getMember()))
-                .toList();
-
-        return ApplicantProfileSliceResponse.of(slice.hasNext(), applicants);
+        return ApplicantProfileSliceResponse.of(
+                slice.hasNext(),
+                slice.stream()
+                        .map(applicant -> ProfileResponse.from(applicant.getMember()))
+                        .toList()
+        );
     }
 
     public void existsByRecruitPostIdAndMemberId(Long postId, Long memberId) {
@@ -142,5 +143,37 @@ public class RecruitPostService {
         if (!applicantRepository.existsByRecruitPostIdAndMemberId(postId, memberId)) {
             throw new BadRequestException(NOT_FOUND_APPLICANT);
         }
+    }
+
+    public RecruitPostSliceResponse getByApplicantMemberId(Long memberId, Pageable pageable) {
+
+        Slice<RecruitPost> posts = recruitPostRepository.findByApplicantMemberId(memberId, pageable);
+
+        return RecruitPostSliceResponse.of(
+                posts.hasNext(),
+                posts.stream()
+                .map(RecruitPostResponse::from)
+                .toList()
+        );
+    }
+
+//    public RecruitPostSliceResponse getByApplicantMemberId(Long memberId, Pageable pageable) {
+//
+//        Slice<Applicant> slice = applicantRepository.findAllByMemberIdJoinFetchRecruitPost(memberId, pageable);
+//
+//        List<RecruitPostResponse> posts = slice.stream()
+//                .map(applicant -> RecruitPostResponse.from(applicant.getRecruitPost()))
+//                .toList();
+//
+//        return RecruitPostSliceResponse.of(slice.hasNext(), posts);
+//    }
+
+    public RecruitPostSliceResponse getByMemberId(Long memberId, Pageable pageable) {
+        Slice<RecruitPost> posts = recruitPostRepository.findByMemberId(memberId, pageable);
+
+        return RecruitPostSliceResponse.of(
+                posts.hasNext(),
+                posts.getContent().stream().map(RecruitPostResponse::from).toList()
+        );
     }
 }
