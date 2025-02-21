@@ -45,7 +45,7 @@ class RecruitPostControllerTest {
         given(recruitPostService.createRecruitPost(anyLong(), any(CreateRecruitPostRequest.class)))
                 .willReturn(1L);
         //when
-        CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(1L,
+        CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(
                 "anyTitle",
                 "anyContent",
                 1,

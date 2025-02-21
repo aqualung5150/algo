@@ -83,7 +83,6 @@ class StudyControllerTest {
         }
 
         Long postId = recruitPostService.createRecruitPost(1L, new CreateRecruitPostRequest(
-                1L,
                 "post1",
                 "content1",
                 3,
