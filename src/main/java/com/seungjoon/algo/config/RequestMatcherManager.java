@@ -39,6 +39,7 @@ public class RequestMatcherManager {
             req(POST, "/login", null),
 
             req(POST, "/recruit-posts/**", MEMBER),
+            req(PUT, "/recruit-posts/**", MEMBER),
 
             //admin
             req(GET, "/admin/**", ADMIN)

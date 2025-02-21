@@ -51,6 +51,16 @@ public class RecruitPostController {
         return ResponseEntity.created(URI.create("/recruit-posts/" + id)).build();
     }
 
+    @PutMapping("{id}")
+    public ResponseEntity<Void> updateRecruitPost(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id,
+            @Valid @RequestBody CreateRecruitPostRequest request
+    ) {
+        recruitPostService.updateRecruitPost(id, principalDetails.getId(), request);
+        return ResponseEntity.ok().build();
+    }
+
     @RequestMapping(value = "{postId}/applicants/{memberId}", method = HEAD)
     public ResponseEntity<Void> existsApplicant(
             @PathVariable Long postId,

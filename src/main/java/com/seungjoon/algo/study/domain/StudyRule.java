@@ -44,4 +44,20 @@ public class StudyRule extends BaseEntity {
     public void addStudyRuleTags(List<StudyRuleTag> studyRuleTags) {
         this.studyRuleTags.addAll(studyRuleTags);
     }
+
+    public void changeStudyRule(
+            int numberOfMembers,
+            int minLevel,
+            int maxLevel,
+            int totalWeek,
+            DayOfWeek submitDayOfWeek,
+            int submitPerWeek
+    ) {
+        this.numberOfMembers = numberOfMembers;
+        this.minLevel = minLevel;
+        this.maxLevel = maxLevel;
+        this.totalWeek = totalWeek;
+        this.submitDayOfWeek = submitDayOfWeek;
+        this.submitPerWeek = submitPerWeek;
+    }
 }

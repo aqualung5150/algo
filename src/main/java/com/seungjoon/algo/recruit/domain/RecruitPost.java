@@ -24,6 +24,9 @@ public class RecruitPost extends BaseEntity {
 
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    private RecruitPostState state;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_rule_id")
     private StudyRule studyRule;
@@ -33,10 +36,20 @@ public class RecruitPost extends BaseEntity {
     private Member member;
 
     @Builder
-    private RecruitPost(String title, String content, StudyRule studyRule, Member member) {
+    public RecruitPost(String title, String content, RecruitPostState state, StudyRule studyRule, Member member) {
         this.title = title;
         this.content = content;
+        this.state = state;
         this.studyRule = studyRule;
         this.member = member;
+    }
+
+    public void changeRecruitPost(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public void changeRecruitPostState(RecruitPostState state) {
+        this.state = state;
     }
 }

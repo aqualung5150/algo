@@ -5,6 +5,7 @@ import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.UnauthorizedException;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
+import com.seungjoon.algo.recruit.domain.RecruitPostState;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.*;
@@ -68,6 +69,8 @@ public class StudyService {
         List<StudyMember> studyMembers = createStudyMembers(study, applicants, authId);
 
         study.addStudyMembers(studyMembers);
+
+        post.changeRecruitPostState(RecruitPostState.COMPLETED);
 
         return study.getId();
     }

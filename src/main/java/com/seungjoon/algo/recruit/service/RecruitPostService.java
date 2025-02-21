@@ -1,20 +1,24 @@
 package com.seungjoon.algo.recruit.service;
 
 import com.seungjoon.algo.exception.BadRequestException;
+import com.seungjoon.algo.exception.UnauthorizedException;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.dto.ProfileResponse;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
+import com.seungjoon.algo.recruit.domain.RecruitPostState;
 import com.seungjoon.algo.recruit.dto.*;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.domain.StudyRuleTag;
+import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import com.seungjoon.algo.study.repository.StudyRuleTagRepository;
 import com.seungjoon.algo.subject.domain.Tag;
 import com.seungjoon.algo.subject.repository.TagRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +32,7 @@ import java.util.List;
 import static com.seungjoon.algo.exception.ExceptionCode.*;
 import static com.seungjoon.algo.exception.ExceptionCode.NOT_FOUND_MEMBER;
 import static com.seungjoon.algo.exception.ExceptionCode.NOT_FOUND_POST;
+import static com.seungjoon.algo.recruit.domain.RecruitPostState.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,16 +47,13 @@ public class RecruitPostService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long createRecruitPost(Long memberId, CreateRecruitPostRequest request) {
+    public Long createRecruitPost(Long authId, CreateRecruitPostRequest request) {
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findById(authId)
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
         List<Tag> tags = tagRepository.findByIdIn(request.getTags());
-
-        if (tags.size() != request.getTags().size()) {
-            throw new BadRequestException(INVALID_TAGS);
-        }
+        validateTagsExist(request, tags);
 
         StudyRule studyRule = studyRuleRepository.save(StudyRule.builder()
                         .numberOfMembers(request.getNumberOfMembers())
@@ -69,6 +71,7 @@ public class RecruitPostService {
         RecruitPost saved = recruitPostRepository.save(RecruitPost.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
+                .state(IN_PROGRESS)
                 .studyRule(studyRule)
                 .member(member)
                 .build()
@@ -78,10 +81,10 @@ public class RecruitPostService {
     }
 
     @Transactional
-    public Applicant createApplicant(Long postId, Long memberId) {
+    public Applicant createApplicant(Long postId, Long authId) {
 
         RecruitPost post = recruitPostRepository.findById(postId).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
+        Member member = memberRepository.findById(authId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
         validateApplicant(post, member);
 
@@ -175,5 +178,43 @@ public class RecruitPostService {
                 posts.hasNext(),
                 posts.getContent().stream().map(RecruitPostResponse::from).toList()
         );
+    }
+
+    @Transactional
+    public void updateRecruitPost(Long postId, Long authId, @Valid CreateRecruitPostRequest request) {
+
+        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+
+        if (!post.getMember().getId().equals(authId)) {
+            throw new UnauthorizedException(NOT_OWN_RESOURCE);
+        }
+
+        if (post.getState() == RecruitPostState.COMPLETED) {
+            throw new BadRequestException(RECRUITMENT_FINISHED);
+        }
+
+        List<Tag> tags = tagRepository.findByIdIn(request.getTags());
+        validateTagsExist(request, tags);
+
+        StudyRule studyRule = post.getStudyRule();
+        studyRule.changeStudyRule(
+                request.getNumberOfMembers(),
+                request.getMinLevel(),
+                request.getMaxLevel(),
+                request.getTotalWeek(),
+                DayOfWeek.valueOf(request.getSubmitDayOfWeek()),
+                request.getSubmitPerWeek()
+        );
+
+        List<StudyRuleTag> studyRuleTags = studyRule.getStudyRuleTags();
+        StudyRuleTag.updateListFromTags(studyRule, studyRuleTags, tags);
+
+        post.changeRecruitPost(request.getTitle(), request.getContent());
+    }
+
+    private void validateTagsExist(CreateRecruitPostRequest request, List<Tag> tags) {
+        if (tags.size() != request.getTags().size()) {
+            throw new BadRequestException(INVALID_TAGS);
+        }
     }
 }

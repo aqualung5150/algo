@@ -12,19 +12,13 @@ import java.util.Optional;
 
 public interface RecruitPostRepository extends JpaRepository<RecruitPost, Long>, RecruitPostRepositoryCustom {
 
-//    @Query("select r from RecruitPost r" +
-//            " join fetch r.member" +
-//            " join fetch r.studyRule sr" +
-//            " join fetch sr.studyRuleTags srt")
-//    Page<RecruitPost> findAllJoinFetch(Pageable pageable);
+    Page<RecruitPost> findByMemberId(Long memberId, Pageable pageable);
 
     @Query("select distinct r from RecruitPost r" +
             " join fetch r.member" +
             " join fetch r.studyRule sr" +
             " where r.id = :id")
     Optional<RecruitPost> findByIdJoinFetch(Long id);
-
-    Page<RecruitPost> findByMemberId(Long memberId, Pageable pageable);
 
     @Query("select r from Applicant a join a.recruitPost r where a.member.id = :memberId")
     Slice<RecruitPost> findByApplicantMemberId(Long memberId, Pageable pageable);
