@@ -27,14 +27,11 @@ public class Member extends BaseEntity {
 
     private String imageUrl;
 
-    @Column(nullable = false)
     private String authType;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberState state;
 

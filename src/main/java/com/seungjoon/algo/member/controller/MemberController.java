@@ -45,7 +45,6 @@ public class MemberController {
         return ResponseEntity.ok(recruitPostService.getByMemberId(id, pageable));
     }
 
-    //TODO: test
     @GetMapping("{id}/applications")
     public ResponseEntity<RecruitPostSliceResponse> getApplications(
             @PathVariable Long id,
