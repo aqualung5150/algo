@@ -53,7 +53,6 @@ public class MemberController {
         return ResponseEntity.ok(recruitPostService.getByApplicantMemberId(id, pageable));
     }
 
-    //TODO: test
     @GetMapping("{id}/studies")
     public ResponseEntity<StudyPageResponse> getStudies(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
