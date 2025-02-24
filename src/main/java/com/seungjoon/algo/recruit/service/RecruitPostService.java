@@ -13,12 +13,10 @@ import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.domain.StudyRuleTag;
-import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import com.seungjoon.algo.study.repository.StudyRuleTagRepository;
 import com.seungjoon.algo.subject.domain.Tag;
 import com.seungjoon.algo.subject.repository.TagRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -194,11 +192,7 @@ public class RecruitPostService {
 
     @Transactional
     public void deleteRecruitPost(Long authId, Long postId) {
-        /*
-        1. 포스트 COMPLETE??
-        2. 애플리컨트 삭제
-        3. 스터디룰 삭제
-         */
+
         RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId)
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
 
@@ -207,14 +201,15 @@ public class RecruitPostService {
         }
 
         // Applicant 삭제
-        //TODO: 단건 딜리트쿼리가 여러번 나감 -> where in으로 최적화?
-        applicantRepository.deleteByRecruitPostId(post.getId());
+        /* 벌크 연산 - clearAutomatically, flushAutomatically 등 옵션이 필요할 수 있음 */
+        applicantRepository.deleteAllByRecruitPostId(post.getId());
 
         // RecruitPost 삭제
         recruitPostRepository.deleteById(post.getId());
 
         // StudyRule 삭제
         //TODO: srt도 단건쿼리가 여러번 나감
+        //-> @OnDelete로 해결 -> 적절한지 확인이 필요함
         if (post.getState() == IN_PROGRESS) {
             studyRuleRepository.deleteById(post.getStudyRule().getId());
         }
