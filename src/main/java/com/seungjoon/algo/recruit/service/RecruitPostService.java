@@ -81,30 +81,21 @@ public class RecruitPostService {
     }
 
     @Transactional
-    public Applicant createApplicant(Long postId, Long authId) {
+    public Long createApplicant(Long postId, Long authId) {
 
         RecruitPost post = recruitPostRepository.findById(postId).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
         Member member = memberRepository.findById(authId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
         validateApplicant(post, member);
 
-        return applicantRepository.save(
+        Applicant saved = applicantRepository.save(
                 Applicant.builder()
                         .recruitPost(post)
                         .member(member)
                         .build()
         );
-    }
 
-    private void validateApplicant(RecruitPost post, Member member) {
-
-        if (post.getMember().getId().equals(member.getId())) {
-            throw new BadRequestException(SAME_AUTHOR_APPLICANT);
-        }
-
-        if (applicantRepository.existsByRecruitPostIdAndMemberId(post.getId(), member.getId())) {
-            throw new BadRequestException(DUPLICATE_APPLICANT);
-        }
+        return saved.getId();
     }
 
     public RecruitPostPageResponse getRecruitPostList(
@@ -125,9 +116,8 @@ public class RecruitPostService {
     }
 
     public RecruitPost getRecruitPostById(Long id) {
-        //TODO: N + 1 문제 해결 - RecruitPost의 Member, StudyRule, StudyRuleTag, Tag를 어떻게 가져올 것인가.
-        return recruitPostRepository.findByIdJoinFetch(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
-//        return recruitPostRepository.findById(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+        return recruitPostRepository.findByIdJoinFetch(id)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
     }
 
     public ApplicantProfileSliceResponse getApplications(Long postId, Pageable pageable) {
@@ -160,19 +150,8 @@ public class RecruitPostService {
         );
     }
 
-//    public RecruitPostSliceResponse getByApplicantMemberId(Long memberId, Pageable pageable) {
-//
-//        Slice<Applicant> slice = applicantRepository.findAllByMemberIdJoinFetchRecruitPost(memberId, pageable);
-//
-//        List<RecruitPostResponse> posts = slice.stream()
-//                .map(applicant -> RecruitPostResponse.from(applicant.getRecruitPost()))
-//                .toList();
-//
-//        return RecruitPostSliceResponse.of(slice.hasNext(), posts);
-//    }
-
     public RecruitPostSliceResponse getByMemberId(Long memberId, Pageable pageable) {
-        Slice<RecruitPost> posts = recruitPostRepository.findByMemberId(memberId, pageable);
+        Slice<RecruitPost> posts = recruitPostRepository.findByMemberIdJoinFetch(memberId, pageable);
 
         return RecruitPostSliceResponse.of(
                 posts.hasNext(),
@@ -181,9 +160,10 @@ public class RecruitPostService {
     }
 
     @Transactional
-    public void updateRecruitPost(Long postId, Long authId, @Valid CreateRecruitPostRequest request) {
+    public void updateRecruitPost(Long postId, Long authId, CreateRecruitPostRequest request) {
 
-        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
 
         if (!post.getMember().getId().equals(authId)) {
             throw new UnauthorizedException(NOT_OWN_RESOURCE);
@@ -210,6 +190,45 @@ public class RecruitPostService {
         StudyRuleTag.updateListFromTags(studyRule, studyRuleTags, tags);
 
         post.changeRecruitPost(request.getTitle(), request.getContent());
+    }
+
+    @Transactional
+    public void deleteRecruitPost(Long authId, Long postId) {
+        /*
+        1. 포스트 COMPLETE??
+        2. 애플리컨트 삭제
+        3. 스터디룰 삭제
+         */
+        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+
+        if (!post.getMember().getId().equals(authId)) {
+            throw new UnauthorizedException(NOT_OWN_RESOURCE);
+        }
+
+        // Applicant 삭제
+        //TODO: 단건 딜리트쿼리가 여러번 나감 -> where in으로 최적화?
+        applicantRepository.deleteByRecruitPostId(post.getId());
+
+        // RecruitPost 삭제
+        recruitPostRepository.deleteById(post.getId());
+
+        // StudyRule 삭제
+        //TODO: srt도 단건쿼리가 여러번 나감
+        if (post.getState() == IN_PROGRESS) {
+            studyRuleRepository.deleteById(post.getStudyRule().getId());
+        }
+    }
+
+    private void validateApplicant(RecruitPost post, Member member) {
+
+        if (post.getMember().getId().equals(member.getId())) {
+            throw new BadRequestException(SAME_AUTHOR_APPLICANT);
+        }
+
+        if (applicantRepository.existsByRecruitPostIdAndMemberId(post.getId(), member.getId())) {
+            throw new BadRequestException(DUPLICATE_APPLICANT);
+        }
     }
 
     private void validateTagsExist(CreateRecruitPostRequest request, List<Tag> tags) {
