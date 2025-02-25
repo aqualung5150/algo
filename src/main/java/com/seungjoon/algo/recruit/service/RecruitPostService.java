@@ -96,6 +96,17 @@ public class RecruitPostService {
         return saved.getId();
     }
 
+    @Transactional
+    public void deleteApplicant(Long postId, Long memberId) {
+
+//        Applicant applicant = applicantRepository.findByRecruitPostIdAndMemberId(postId, id)
+//                .orElseThrow(() -> new BadRequestException(NOT_FOUND_APPLICANT));
+
+//        applicantRepository.delete();
+
+        applicantRepository.deleteByRecruitPostIdAndMemberId(postId, memberId);
+    }
+
     public RecruitPostPageResponse getRecruitPostList(
             RecruitPostSearchCondition condition,
             Pageable pageable

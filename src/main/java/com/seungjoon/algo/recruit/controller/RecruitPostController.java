@@ -88,6 +88,16 @@ public class RecruitPostController {
         return ResponseEntity.created(URI.create("/recruit-posts/" + postId)).build();
     }
 
+    @DeleteMapping("{postId}/applicants")
+    public ResponseEntity<Void> deleteApplicant(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long postId
+    ) {
+        recruitPostService.deleteApplicant(postId, principalDetails.getId());
+
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteRecruitPost(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
