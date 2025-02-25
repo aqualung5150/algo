@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
 
     boolean existsByRecruitPostIdAndMemberId(Long postId, Long memberId);
+
+    void deleteByRecruitPostIdAndMemberId(Long postId, Long memberId);
 
     @Query(value = "select a from Applicant a join fetch a.member where a.recruitPost.id = :postId")
     List<Applicant> findAllByPostIdJoinFetchMember(Long postId);
