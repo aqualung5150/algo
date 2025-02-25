@@ -11,6 +11,7 @@ import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.*;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.dto.StudyPageResponse;
+import com.seungjoon.algo.study.dto.StudyResponse;
 import com.seungjoon.algo.study.repository.StudyMemberRepository;
 import com.seungjoon.algo.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,13 @@ public class StudyService {
         return StudyPageResponse.of(studies.getTotalElements(), studies.getContent());
     }
 
+    public StudyResponse getStudyById(Long id) {
+
+        return StudyResponse.from(studyRepository.findByIdJoinFetch(id)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY)));
+    }
+
+    //TODO: 팀 인원 어떻게
     @Transactional
     public Long createStudy(Long authId, CreateStudyRequest request) {
 

@@ -1,6 +1,6 @@
 package com.seungjoon.algo.study.dto;
 
-import com.seungjoon.algo.member.dto.ProfileResponse;
+import com.seungjoon.algo.study.domain.Study;
 import lombok.Data;
 
 import java.util.List;
@@ -8,7 +8,20 @@ import java.util.List;
 @Data
 public class StudyResponse {
 
-    private Long id;
-    private List<ProfileResponse> members;
-    private StudyRuleResponse studyRule;
+    private final Long id;
+    private final StudyRuleResponse studyRule;
+    private final List<StudyMemberResponse> members;
+
+    public static StudyResponse from(Study study) {
+
+        List<StudyMemberResponse> members = study.getStudyMembers().stream()
+                .map(StudyMemberResponse::from)
+                .toList();
+
+        return new StudyResponse(
+                study.getId(),
+                StudyRuleResponse.from(study.getStudyRule()),
+                members
+        );
+    }
 }

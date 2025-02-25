@@ -29,7 +29,8 @@ public enum ExceptionCode {
     INVALID_TAGS(1016, "올바르지 않은 태그가 포함되어 있습니다."),
     INVALID_NUMBER_OF_MEMBERS(1017, "정해진 회원 수에 맞지 않습니다."),
     INVALID_APPLICANTS_SELECTION(1018, "지원하지 않은 멤버입니다."),
-    RECRUITMENT_FINISHED(1019, "모집이 완료된 글은 수정할 수 없습니다.");
+    RECRUITMENT_FINISHED(1019, "모집이 완료된 글은 수정할 수 없습니다."),
+    NOT_FOUND_STUDY(1020, "존재하지 않는 스터디입니다.");
 
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");
 

@@ -1,6 +1,7 @@
 package com.seungjoon.algo.study.dto;
 
 import com.seungjoon.algo.study.domain.Study;
+import com.seungjoon.algo.study.domain.StudyState;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,18 +19,23 @@ public class StudyPageResponse {
 
         return new StudyPageResponse(
                 totalCount,
-                studies.stream().map(study -> new StudyProfile(study.getId(), study.getName()))
-                        .toList()
+                studies.stream().map(study -> new StudyProfile(
+                        study.getId(),
+                                study.getName(),
+                        study.getState())
+                        ).toList()
         );
     }
 
     static public class StudyProfile {
         private Long id;
         private String name;
+        private String state;
 
-        public StudyProfile(Long id, String name) {
+        public StudyProfile(Long id, String name, StudyState state) {
             this.id = id;
             this.name = name;
+            this.state = state.name();
         }
     }
 }

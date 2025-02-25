@@ -38,14 +38,6 @@ public class Study extends BaseEntity {
     @OneToMany
     private List<StudyMember> studyMembers = new ArrayList<>();
 
-//    @Builder
-//    private Study(LocalDate firstSubmitDate, LocalDate lastSubmitDate, StudyState state, StudyRule studyRule) {
-//        this.firstSubmitDate = firstSubmitDate;
-//        this.lastSubmitDate = lastSubmitDate;
-//        this.state = state;
-//        this.studyRule = studyRule;
-//    }
-
     @Builder
     public Study(String name, LocalDate firstSubmitDate, LocalDate lastSubmitDate, StudyState state, StudyRule studyRule) {
         this.name = name;
