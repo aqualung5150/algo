@@ -1,9 +1,11 @@
 package com.seungjoon.algo.study.controller;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
+import com.seungjoon.algo.study.dto.ClosingVoteResponse;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.dto.StudyResponse;
 import com.seungjoon.algo.study.service.StudyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +23,7 @@ public class StudyController {
     @PostMapping
     public ResponseEntity<Void> create(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestBody CreateStudyRequest request
+            @Valid @RequestBody CreateStudyRequest request
     ) {
         Long id = studyService.createStudy(principalDetails.getId(), request);
 
@@ -34,4 +36,32 @@ public class StudyController {
 
         return ResponseEntity.ok(studyResponse);
     }
+
+    @GetMapping("{id}/closing-vote")
+    public ResponseEntity<ClosingVoteResponse> getCloseVoteCount(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                new ClosingVoteResponse(studyService.countClosingVote(id))
+        );
+    }
+
+    @PostMapping("{id}/closing-vote")
+    public ResponseEntity<Void> createClosingVote(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id
+    ) {
+        studyService.voteClosing(id, principalDetails.getId());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /*TODO: 종료투표 취소 가능하게 해야 할까? */
+//    @DeleteMapping("{id}/closing-vote")
+//    public ResponseEntity<Void> cancelClosingVote(
+//            @AuthenticationPrincipal PrincipalDetails principalDetails,
+//            @PathVariable Long id
+//    ) {
+//        studyService.cancelClosingVote(id, principalDetails.getId());
+//
+//        return ResponseEntity.noContent().build();
+//    }
 }

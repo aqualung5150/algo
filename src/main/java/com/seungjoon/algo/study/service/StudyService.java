@@ -1,8 +1,9 @@
 package com.seungjoon.algo.study.service;
 
 import com.seungjoon.algo.exception.BadRequestException;
-import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.UnauthorizedException;
+import com.seungjoon.algo.member.domain.Member;
+import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.domain.RecruitPostState;
@@ -12,6 +13,7 @@ import com.seungjoon.algo.study.domain.*;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.dto.StudyPageResponse;
 import com.seungjoon.algo.study.dto.StudyResponse;
+import com.seungjoon.algo.study.repository.ClosingVoteRepository;
 import com.seungjoon.algo.study.repository.StudyMemberRepository;
 import com.seungjoon.algo.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.study.domain.StudyState.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,6 +38,14 @@ public class StudyService {
     private final ApplicantRepository applicantRepository;
     private final StudyRepository studyRepository;
     private final StudyMemberRepository studyMemberRepository;
+    private final ClosingVoteRepository closingVoteRepository;
+    private final MemberRepository memberRepository;
+
+    public StudyResponse getStudyById(Long id) {
+
+        return StudyResponse.from(studyRepository.findByIdJoinFetch(id)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY)));
+    }
 
     public StudyPageResponse getStudiesByMemberId(Long memberId, Long authId, Pageable pageable) {
         if (!memberId.equals(authId)) {
@@ -46,13 +57,7 @@ public class StudyService {
         return StudyPageResponse.of(studies.getTotalElements(), studies.getContent());
     }
 
-    public StudyResponse getStudyById(Long id) {
-
-        return StudyResponse.from(studyRepository.findByIdJoinFetch(id)
-                .orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY)));
-    }
-
-    //TODO: 팀 인원 어떻게
+    //TODO: 팀 인원 어떻게 | 멤버id 중복 못 넣게
     @Transactional
     public Long createStudy(Long authId, CreateStudyRequest request) {
 
@@ -71,7 +76,7 @@ public class StudyService {
                 .studyRule(post.getStudyRule())
                 .firstSubmitDate(getFirstSubmitDate(studyRule))
                 .lastSubmitDate(getLastSubmitDate(studyRule))
-                .state(StudyState.IN_PROGRESS)
+                .state(IN_PROGRESS)
                 .build());
 
         List<StudyMember> studyMembers = createStudyMembers(study, applicants, authId);
@@ -129,5 +134,42 @@ public class StudyService {
     private LocalDate getLastSubmitDate(StudyRule studyRule) {
         return LocalDate.now()
                 .plusWeeks(studyRule.getTotalWeek());
+    }
+
+    public Long countClosingVote(Long studyId) {
+        return closingVoteRepository.countByStudyId(studyId);
+    }
+
+    @Transactional
+    public void voteClosing(Long studyId, Long memberId) {
+
+        Study study = studyRepository.findByIdJoinFetch(studyId).orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
+
+        /*
+        findByXXXId는 불필요한 join을 유발함
+        https://velog.io/@ohzzi/Data-Jpa-findByXXXId-%EB%8A%94-%EB%B6%88%ED%95%84%EC%9A%94%ED%95%9C-join%EC%9D%84-%EC%9C%A0%EB%B0%9C%ED%95%9C%EB%8B%A4
+        */
+        closingVoteRepository.findByStudyAndMember(study, member).ifPresent(closingVote ->
+                {throw new BadRequestException(DUPLICATE_CLOSING_VOTE);}
+        );
+
+        saveOrCloseStudy(study, member);
+    }
+
+    private void saveOrCloseStudy(Study study, Member member) {
+        Long voteCount = closingVoteRepository.countByStudyId(study.getId());
+
+        if (voteCount + 1L >= study.getStudyMembers().size()) {
+            study.changeState(FAILED);
+            closingVoteRepository.deleteByStudyId(study.getId());
+        } else {
+            closingVoteRepository.save(
+                    ClosingVote.builder()
+                            .study(study)
+                            .member(member)
+                            .build()
+            );
+        }
     }
 }

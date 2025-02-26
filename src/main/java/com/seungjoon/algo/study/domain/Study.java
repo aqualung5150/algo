@@ -50,4 +50,8 @@ public class Study extends BaseEntity {
     public void addStudyMembers(List<StudyMember> studyMembers) {
         this.studyMembers.addAll(studyMembers);
     }
+
+    public void changeState(StudyState state) {
+        this.state = state;
+    }
 }
