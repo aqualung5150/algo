@@ -10,10 +10,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
+//TODO: findByXXXId 불필요한 join 발생하는지 확인해보고 리팩토링하기
 public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
-
+    //TODO: limit 1
     boolean existsByRecruitPostIdAndMemberId(Long postId, Long memberId);
 
+    @Modifying
+    @Query("delete from Applicant a where a.recruitPost.id = :postId and a.member.id = :memberId")
     void deleteByRecruitPostIdAndMemberId(Long postId, Long memberId);
 
     @Query(value = "select a from Applicant a join fetch a.member where a.recruitPost.id = :postId")
