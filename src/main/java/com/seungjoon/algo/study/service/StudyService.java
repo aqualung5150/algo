@@ -13,6 +13,7 @@ import com.seungjoon.algo.study.domain.*;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.dto.StudyPageResponse;
 import com.seungjoon.algo.study.dto.StudyResponse;
+import com.seungjoon.algo.study.repository.BanVoteRepository;
 import com.seungjoon.algo.study.repository.ClosingVoteRepository;
 import com.seungjoon.algo.study.repository.StudyMemberRepository;
 import com.seungjoon.algo.study.repository.StudyRepository;
@@ -40,6 +41,7 @@ public class StudyService {
     private final StudyMemberRepository studyMemberRepository;
     private final ClosingVoteRepository closingVoteRepository;
     private final MemberRepository memberRepository;
+    private final BanVoteRepository banVoteRepository;
 
     public StudyResponse getStudyById(Long id) {
 
@@ -144,23 +146,19 @@ public class StudyService {
     public void voteClosing(Long studyId, Long memberId) {
 
         Study study = studyRepository.findByIdJoinFetch(studyId).orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
+        validateStudyInProgress(study);
+
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
-        /*
-        findByXXXId는 불필요한 join을 유발함
-        https://velog.io/@ohzzi/Data-Jpa-findByXXXId-%EB%8A%94-%EB%B6%88%ED%95%84%EC%9A%94%ED%95%9C-join%EC%9D%84-%EC%9C%A0%EB%B0%9C%ED%95%9C%EB%8B%A4
-        */
-        closingVoteRepository.findByStudyAndMember(study, member).ifPresent(closingVote ->
-                {throw new BadRequestException(DUPLICATE_CLOSING_VOTE);}
-        );
+        List<ClosingVote> votes = closingVoteRepository.findByStudyIdJoinFetch(studyId);
 
-        saveOrCloseStudy(study, member);
-    }
+        votes.forEach(closingVote -> {
+            if (closingVote.getMember().getId().equals(memberId)) {
+                throw new BadRequestException(DUPLICATE_CLOSING_VOTE);
+            }
+        });
 
-    private void saveOrCloseStudy(Study study, Member member) {
-        Long voteCount = closingVoteRepository.countByStudyId(study.getId());
-
-        if (voteCount + 1L >= study.getStudyMembers().size()) {
+        if (votes.size() + 1L >= study.getStudyMembers().size()) {
             study.changeState(FAILED);
             closingVoteRepository.deleteByStudyId(study.getId());
         } else {
@@ -172,4 +170,23 @@ public class StudyService {
             );
         }
     }
+
+    public void banVote(Long studyId, Long voterId, Long targetId) {
+
+        Study study = studyRepository.findById(studyId).orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
+        validateStudyInProgress(study);
+
+        if (banVoteRepository.existsByStudyIdAndVoterIdAndTargetId(studyId, voterId, targetId)) {
+            throw new BadRequestException(DUPLICATE_BAN_VOTE);
+        }
+
+
+    }
+
+    private void validateStudyInProgress(Study study) {
+        if (study.getState() != IN_PROGRESS) {
+            throw new BadRequestException(STUDY_CLOSED);
+        }
+    }
+
 }
