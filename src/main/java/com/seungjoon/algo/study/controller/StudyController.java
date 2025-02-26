@@ -64,4 +64,15 @@ public class StudyController {
 //
 //        return ResponseEntity.noContent().build();
 //    }
+
+    @PostMapping("{studyId}/ban-vote/{targetId}")
+    public ResponseEntity<Void> createBanVote(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long studyId,
+            @PathVariable Long targetId
+    ) {
+        studyService.banVote(studyId, principalDetails.getId(), targetId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

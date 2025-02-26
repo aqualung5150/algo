@@ -31,7 +31,12 @@ public enum ExceptionCode {
     INVALID_APPLICANTS_SELECTION(1018, "지원하지 않은 멤버입니다."),
     RECRUITMENT_FINISHED(1019, "모집이 완료된 글은 수정할 수 없습니다."),
     NOT_FOUND_STUDY(1020, "존재하지 않는 스터디입니다."),
-    DUPLICATE_CLOSING_VOTE(1021, "이미 스터디 종료에 투표했습니다.");
+    DUPLICATE_CLOSING_VOTE(1021, "이미 스터디 종료에 투표했습니다."),
+    DUPLICATE_BAN_VOTE(1022, "이미 해당 팀원에게 강퇴 투표했습니다."),
+    STUDY_CLOSED(1023, "해당 스터디는 종료되었습니다."),
+    MEMBER_NOT_IN_STUDY(1024, "스터디의 팀원이 아닙니다."),
+    SAME_VOTER_TARGET(1025, "자신에게 투표할 수 없습니다.");
+
 
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");
 

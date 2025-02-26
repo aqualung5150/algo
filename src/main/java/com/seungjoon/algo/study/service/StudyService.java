@@ -28,7 +28,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
-import static com.seungjoon.algo.study.domain.StudyState.*;
+import static com.seungjoon.algo.study.domain.StudyState.FAILED;
+import static com.seungjoon.algo.study.domain.StudyState.IN_PROGRESS;
 
 @Service
 @Transactional(readOnly = true)
@@ -171,16 +172,33 @@ public class StudyService {
         }
     }
 
+    @Transactional
     public void banVote(Long studyId, Long voterId, Long targetId) {
 
-        Study study = studyRepository.findById(studyId).orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
+        if (voterId.equals(targetId)) {
+            throw new BadRequestException(SAME_VOTER_TARGET);
+        }
+
+        Study study = studyRepository.findByIdJoinFetch(studyId).orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
+
         validateStudyInProgress(study);
+        validateMemberInStudy(study, voterId);
+        validateMemberInStudy(study, targetId);
+
+        Member voter = memberRepository.findById(voterId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
+        Member target = memberRepository.findById(targetId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
         if (banVoteRepository.existsByStudyIdAndVoterIdAndTargetId(studyId, voterId, targetId)) {
             throw new BadRequestException(DUPLICATE_BAN_VOTE);
         }
 
-
+        banVoteRepository.save(
+                BanVote.builder()
+                        .study(study)
+                        .voter(voter)
+                        .target(target)
+                        .build()
+        );
     }
 
     private void validateStudyInProgress(Study study) {
@@ -189,4 +207,14 @@ public class StudyService {
         }
     }
 
+    private void validateMemberInStudy(Study study, Long memberId) {
+
+        List<Long> memberIds = study.getStudyMembers().stream()
+                .mapToLong(studyMember -> studyMember.getMember().getId())
+                .boxed().toList();
+
+        if (!memberIds.contains(memberId)) {
+            throw new BadRequestException(MEMBER_NOT_IN_STUDY);
+        }
+    }
 }

@@ -3,8 +3,12 @@ package com.seungjoon.algo.study.domain;
 import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.member.domain.Member;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BanVote extends BaseEntity {
 
     @Id
@@ -21,6 +25,13 @@ public class BanVote extends BaseEntity {
     private Member voter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "voted_id")
-    private Member voted;
+    @JoinColumn(name = "target_id")
+    private Member target;
+
+    @Builder
+    private BanVote(Study study, Member voter, Member target) {
+        this.study = study;
+        this.voter = voter;
+        this.target = target;
+    }
 }
