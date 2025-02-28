@@ -23,12 +23,12 @@ public class RequestMatcherManager {
     }
 
     private static final List<RequestInfo> REQUEST_INFO_LIST = List.of(
+//            req(GET, "/**", null),
             //test
             req(GET, "/hello", null),
             req(GET, "/test-mem", MEMBER),
 
             //
-            req(GET, "/**", null),
             req(HEAD, "/recruit-posts/*/applicants/*", null),
             req(GET, "/members/*/studies", MEMBER),
             req(DELETE, "/**", MEMBER),
@@ -48,6 +48,7 @@ public class RequestMatcherManager {
             req(GET, "/admin/**", ADMIN),
 
             //study
+            req(GET, "/study/**", null),
             req(POST, "/study/**", MEMBER)
     );
 
