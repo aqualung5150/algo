@@ -1,4 +1,4 @@
-package com.seungjoon.algo.subject.domain;
+package com.seungjoon.algo.submission.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

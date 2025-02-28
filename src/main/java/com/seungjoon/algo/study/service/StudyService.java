@@ -7,16 +7,26 @@ import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.domain.RecruitPostState;
+import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.*;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
+import com.seungjoon.algo.study.dto.CreateSubmissionRequest;
 import com.seungjoon.algo.study.dto.StudyPageResponse;
 import com.seungjoon.algo.study.dto.StudyResponse;
 import com.seungjoon.algo.study.repository.BanVoteRepository;
 import com.seungjoon.algo.study.repository.ClosingVoteRepository;
 import com.seungjoon.algo.study.repository.StudyMemberRepository;
 import com.seungjoon.algo.study.repository.StudyRepository;
+import com.seungjoon.algo.submission.domain.Submission;
+import com.seungjoon.algo.submission.domain.SubmissionTag;
+import com.seungjoon.algo.submission.domain.SubmissionVisibility;
+import com.seungjoon.algo.submission.domain.Tag;
+import com.seungjoon.algo.submission.repository.SubmissionRepository;
+import com.seungjoon.algo.submission.repository.SubmissionTagRepository;
+import com.seungjoon.algo.submission.repository.TagRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +53,9 @@ public class StudyService {
     private final ClosingVoteRepository closingVoteRepository;
     private final MemberRepository memberRepository;
     private final BanVoteRepository banVoteRepository;
+    private final SubmissionRepository submissionRepository;
+    private final TagRepository tagRepository;
+    private final SubmissionTagRepository submissionTagRepository;
 
     public StudyResponse getStudyById(Long id) {
 
@@ -215,6 +228,44 @@ public class StudyService {
 
         if (!memberIds.contains(memberId)) {
             throw new BadRequestException(MEMBER_NOT_IN_STUDY);
+        }
+    }
+
+    @Transactional
+    public Long submit(Long studyId, Long memberId, @Valid CreateSubmissionRequest request) {
+
+        Study study = studyRepository.findByIdJoinFetch(studyId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
+
+        validateStudyInProgress(study);
+        validateMemberInStudy(study, memberId);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
+
+        List<Tag> tags = tagRepository.findByIdIn(request.getTags());
+        validateTagsExist(request, tags);
+
+        Submission submission = submissionRepository.save(Submission.builder()
+                .study(study)
+                .member(member)
+                .content(request.getContent())
+                .subjectNumber(request.getSubjectNumber())
+                .visibility(SubmissionVisibility.valueOf(request.getVisibility()))
+                .build());
+
+        List<SubmissionTag> submissionTags = SubmissionTag.toListFromTags(submission, tags);
+        submissionTagRepository.saveAll(submissionTags);
+
+        //TODO: oneToMany를 배치인서트할 지 고민이 된다...
+        submission.addSubmissionTags(submissionTags);
+
+        return submission.getId();
+    }
+
+    private void validateTagsExist(CreateSubmissionRequest request, List<Tag> tags) {
+        if (tags.size() != request.getTags().size()) {
+            throw new BadRequestException(INVALID_TAGS);
         }
     }
 }

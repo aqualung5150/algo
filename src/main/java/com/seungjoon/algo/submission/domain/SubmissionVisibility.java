@@ -1,4 +1,4 @@
-package com.seungjoon.algo.subject.domain;
+package com.seungjoon.algo.submission.domain;
 
 public enum SubmissionVisibility {
     PUBLIC, PRIVATE;

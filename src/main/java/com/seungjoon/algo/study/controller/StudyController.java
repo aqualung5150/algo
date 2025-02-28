@@ -1,14 +1,13 @@
 package com.seungjoon.algo.study.controller;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
-import com.seungjoon.algo.study.dto.ClosingVoteResponse;
-import com.seungjoon.algo.study.dto.CreateStudyRequest;
-import com.seungjoon.algo.study.dto.StudyResponse;
+import com.seungjoon.algo.study.dto.*;
 import com.seungjoon.algo.study.service.StudyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -74,5 +73,45 @@ public class StudyController {
         studyService.banVote(studyId, principalDetails.getId(), targetId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    /* Submission */
+    @PostMapping("{id}/submissions")
+    public ResponseEntity<Void> createSubmission(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id,
+            @Valid @RequestBody CreateSubmissionRequest request
+    ) {
+
+        Long submissionId = studyService.submit(id, principalDetails.getId(), request);
+
+        return ResponseEntity.created(URI.create("/study/" + id + "/submissions/" + submissionId)).build();
+    }
+
+    /*
+    TODO: 인증이 필요없는 uri로 설정하면 비공개 게시글일때 어떻게 구분하지???
+     */
+    @GetMapping("{studyId}/submissions/{submissionId}")
+    public ResponseEntity<SubmissionResponse> getStudySubmissions(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long studyId,
+            @PathVariable Long submissionId
+    ) {
+
+//        boolean authenticated = SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof PrincipalDetails;
+////        System.out.println(principal);
+////        System.out.println(principal.getClass().getName());
+//        if (!authenticated) {
+//            System.out.println("Not authenticated");
+//        } else {
+//            System.out.println("Authenticated");
+//        }
+        if (principalDetails == null) {
+            System.out.println("principal details is null");
+        } else {
+            System.out.println("principal details is " + principalDetails);
+        }
+
+        return null;
     }
 }
