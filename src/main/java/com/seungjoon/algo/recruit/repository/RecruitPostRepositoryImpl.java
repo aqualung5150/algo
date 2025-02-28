@@ -19,7 +19,7 @@ import java.util.List;
 import static com.seungjoon.algo.recruit.domain.QRecruitPost.recruitPost;
 import static com.seungjoon.algo.study.domain.QStudyRule.studyRule;
 import static com.seungjoon.algo.study.domain.QStudyRuleTag.studyRuleTag;
-import static com.seungjoon.algo.subject.domain.QTag.tag;
+import static com.seungjoon.algo.submission.domain.QTag.tag;
 
 @Repository
 public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{

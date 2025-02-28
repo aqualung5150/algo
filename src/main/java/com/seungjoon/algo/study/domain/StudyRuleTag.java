@@ -1,7 +1,7 @@
 package com.seungjoon.algo.study.domain;
 
 import com.seungjoon.algo.global.BaseEntity;
-import com.seungjoon.algo.subject.domain.Tag;
+import com.seungjoon.algo.submission.domain.Tag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

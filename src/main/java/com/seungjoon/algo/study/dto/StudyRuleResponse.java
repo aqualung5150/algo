@@ -2,8 +2,6 @@ package com.seungjoon.algo.study.dto;
 
 
 import com.seungjoon.algo.study.domain.StudyRule;
-import com.seungjoon.algo.study.domain.StudyRuleTag;
-import com.seungjoon.algo.subject.domain.Tag;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.seungjoon.algo.study.domain;
 
-import com.seungjoon.algo.subject.domain.Tag;
+import com.seungjoon.algo.submission.domain.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 

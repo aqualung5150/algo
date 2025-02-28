@@ -15,8 +15,8 @@ import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.domain.StudyRuleTag;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import com.seungjoon.algo.study.repository.StudyRuleTagRepository;
-import com.seungjoon.algo.subject.domain.Tag;
-import com.seungjoon.algo.subject.repository.TagRepository;
+import com.seungjoon.algo.submission.domain.Tag;
+import com.seungjoon.algo.submission.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +44,8 @@ public class RecruitPostService {
     private final StudyRuleTagRepository studyRuleTagRepository;
     private final MemberRepository memberRepository;
 
+
+    //TODO: 완료된 모집글에 대한 예외 처리
     @Transactional
     public Long createRecruitPost(Long authId, CreateRecruitPostRequest request) {
 
@@ -69,7 +71,7 @@ public class RecruitPostService {
         RecruitPost saved = recruitPostRepository.save(RecruitPost.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
-                .state(IN_PROGRESS)
+                .state(RECRUITING)
                 .studyRule(studyRule)
                 .member(member)
                 .build()
@@ -221,7 +223,7 @@ public class RecruitPostService {
         // StudyRule 삭제
         //TODO: srt도 단건쿼리가 여러번 나감
         //-> @OnDelete로 해결 -> 적절한지 확인이 필요함
-        if (post.getState() == IN_PROGRESS) {
+        if (post.getState() == RECRUITING) {
             studyRuleRepository.deleteById(post.getStudyRule().getId());
         }
     }

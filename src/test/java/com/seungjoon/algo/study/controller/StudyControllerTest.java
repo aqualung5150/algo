@@ -10,8 +10,8 @@ import com.seungjoon.algo.study.domain.Study;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.repository.StudyRepository;
 import com.seungjoon.algo.study.service.StudyService;
-import com.seungjoon.algo.subject.domain.Tag;
-import com.seungjoon.algo.subject.repository.TagRepository;
+import com.seungjoon.algo.submission.domain.Tag;
+import com.seungjoon.algo.submission.repository.TagRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.net.URI;
 import java.util.List;
 
 @SpringBootTest

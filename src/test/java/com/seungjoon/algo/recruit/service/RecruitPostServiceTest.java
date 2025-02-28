@@ -6,6 +6,7 @@ import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
+import com.seungjoon.algo.submission.repository.TagRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,7 +36,8 @@ class RecruitPostServiceTest {
     private ApplicantRepository applicantRepository;
     @Mock
     private MemberRepository memberRepository;
-
+    @Mock
+    private TagRepository tagRepository;
 
     @Test
     void sameAuthorAndApplicant() {
@@ -93,4 +95,57 @@ class RecruitPostServiceTest {
                 .extracting("code")
                 .isEqualTo(1012);
     }
+
+//    @Test
+//    void updateTagsOfPost() {
+//        //given
+//        Tag tag1 = new Tag(1L, "dp");
+//        Tag tag2 = new Tag(2L, "dfs");
+//        Tag tag3 = new Tag(3L, "bfs");
+//
+//
+//
+//        StudyRule studyRule = StudyRule.builder()
+//                .build();
+//
+//        studyRule.addStudyRuleTags(StudyRuleTag.toListFromTags(studyRule, List.of(tag1, tag2)));
+//
+//        Member member = Member.builder()
+//                .username("member")
+//                .email("member@gmail.com")
+//                .build();
+//        ReflectionTestUtils.setField(member, "id", 1L);
+//
+//        given(recruitPostRepository.findByIdJoinFetch(anyLong()))
+//                .willReturn(Optional.ofNullable(RecruitPost.builder()
+//                        .title("post")
+//                        .state(RecruitPostState.IN_PROGRESS)
+//                        .studyRule(studyRule)
+//                        .member(member)
+//                        .build())
+//                );
+//
+//        given(tagRepository.findByIdIn(anyList()))
+//                .willReturn(List.of(tag1, tag2));
+//
+//        //when
+//
+//        CreateRecruitPostRequest request = new CreateRecruitPostRequest(
+//                "changed",
+//                "changed",
+//                3,
+//                10,
+//                15,
+//                4,
+//                "FRIDAY",
+//                5,
+//                List.of(2L, 3L)
+//        );
+//
+//        recruitPostService.updateRecruitPost(1L, 1L, request);
+//
+////        RecruitPost post = recruitPostRepository.findByIdJoinFetch(1L).get();
+//
+//        //then
+//    }
 }

@@ -2,7 +2,7 @@ package com.seungjoon.algo.evaluation.domain;
 
 import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.member.domain.Member;
-import com.seungjoon.algo.subject.domain.Submission;
+import com.seungjoon.algo.submission.domain.Submission;
 import jakarta.persistence.*;
 
 @Entity
