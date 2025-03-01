@@ -4,10 +4,15 @@ import com.seungjoon.algo.global.BaseEntity;
 import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.domain.StudyRuleTag;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubmissionTag extends BaseEntity {
 
     @Id

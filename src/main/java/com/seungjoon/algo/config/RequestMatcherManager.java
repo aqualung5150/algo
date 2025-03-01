@@ -15,9 +15,9 @@ import static org.springframework.http.HttpMethod.*;
 
 public class RequestMatcherManager {
 
-    public RequestMatcher getRequestMatchersByRole(@Nullable Role minRole) {
+    public RequestMatcher getRequestMatchersByRole(@Nullable Role role) {
         return new OrRequestMatcher(REQUEST_INFO_LIST.stream()
-                .filter(reqInfo -> Objects.equals(reqInfo.minRole, minRole))
+                .filter(reqInfo -> Objects.equals(reqInfo.minRole, role))
                 .map(reqInfo -> new AntPathRequestMatcher(reqInfo.pattern(), reqInfo.method().name()))
                 .toArray(AntPathRequestMatcher[]::new));
     }
@@ -49,7 +49,10 @@ public class RequestMatcherManager {
 
             //study
             req(GET, "/study/**", null),
-            req(POST, "/study/**", MEMBER)
+            req(POST, "/study/**", MEMBER),
+
+            //submission
+            req(GET, "/submissions/**", null)
     );
 
     private record RequestInfo(HttpMethod method, String pattern, Role minRole) {
