@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class RecruitPostSearchCondition {
+public class RecruitPostCondition {
 
     private String title;
     private List<Long> tag;

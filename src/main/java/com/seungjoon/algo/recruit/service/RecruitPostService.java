@@ -110,7 +110,7 @@ public class RecruitPostService {
     }
 
     public RecruitPostPageResponse getRecruitPostList(
-            RecruitPostSearchCondition condition,
+            RecruitPostCondition condition,
             Pageable pageable
     ) {
 
@@ -120,9 +120,7 @@ public class RecruitPostService {
 
         return RecruitPostPageResponse.of(
                 totalCount,
-                posts.getContent().stream()
-                        .map(RecruitPostResponse::from)
-                        .toList()
+                posts.getContent()
         );
     }
 
@@ -155,9 +153,7 @@ public class RecruitPostService {
 
         return RecruitPostSliceResponse.of(
                 posts.hasNext(),
-                posts.stream()
-                .map(RecruitPostResponse::from)
-                .toList()
+                posts.getContent()
         );
     }
 
@@ -166,7 +162,7 @@ public class RecruitPostService {
 
         return RecruitPostSliceResponse.of(
                 posts.hasNext(),
-                posts.getContent().stream().map(RecruitPostResponse::from).toList()
+                posts.getContent()
         );
     }
 

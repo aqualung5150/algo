@@ -27,7 +27,7 @@ public class RecruitPostController {
 
     @GetMapping
     public RecruitPostPageResponse getRecruitPosts(
-            @ModelAttribute RecruitPostSearchCondition condition,
+            @ModelAttribute RecruitPostCondition condition,
             @PageableDefault(size = 20, sort = "createdDate", direction = DESC) Pageable pageable
     ) {
 

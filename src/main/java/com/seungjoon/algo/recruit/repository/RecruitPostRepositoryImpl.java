@@ -4,7 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
-import com.seungjoon.algo.recruit.dto.RecruitPostSearchCondition;
+import com.seungjoon.algo.recruit.dto.RecruitPostCondition;
 import com.seungjoon.algo.utils.QuerydslUtils;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -38,7 +38,7 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
            StudyRuleTag에 대해 조회?
          */
     @Override
-    public Page<RecruitPost> findAllByCondition(RecruitPostSearchCondition condition, Pageable pageable) {
+    public Page<RecruitPost> findAllByCondition(RecruitPostCondition condition, Pageable pageable) {
 
         List<RecruitPost> posts = queryFactory
                 .selectFrom(recruitPost)
@@ -100,7 +100,7 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
 
     private JPAQuery<Long> joinStudyRuleByCondition(
             JPAQuery<Long> countQuery,
-            RecruitPostSearchCondition condition
+            RecruitPostCondition condition
     ) {
         if (
                 condition.getMaxLevel() != null ||

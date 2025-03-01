@@ -27,6 +27,7 @@ public class StudyRule extends BaseEntity {
     private int minLevel;
     private int maxLevel;
     private int totalWeek;
+    @Enumerated(EnumType.STRING)
     private DayOfWeek submitDayOfWeek;
     private int submitPerWeek;
 

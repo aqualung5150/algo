@@ -1,5 +1,6 @@
 package com.seungjoon.algo.recruit.dto;
 
+import com.seungjoon.algo.recruit.domain.RecruitPost;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,10 @@ public class RecruitPostPageResponse {
     private Long totalCount;
     private List<RecruitPostResponse> posts;
 
-    public static RecruitPostPageResponse of(Long totalCount, List<RecruitPostResponse> posts) {
-        return new RecruitPostPageResponse(totalCount, posts);
+    public static RecruitPostPageResponse of(Long totalCount, List<RecruitPost> posts) {
+        return new RecruitPostPageResponse(
+                totalCount,
+                posts.stream().map(RecruitPostResponse::from).toList()
+        );
     }
 }

@@ -88,30 +88,11 @@ public class StudyController {
         return ResponseEntity.created(URI.create("/study/" + id + "/submissions/" + submissionId)).build();
     }
 
-    /*
-    TODO: 인증이 필요없는 uri로 설정하면 비공개 게시글일때 어떻게 구분하지???
-     */
-    @GetMapping("{studyId}/submissions/{submissionId}")
-    public ResponseEntity<SubmissionResponse> getStudySubmissions(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable Long studyId,
-            @PathVariable Long submissionId
-    ) {
-
-//        boolean authenticated = SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof PrincipalDetails;
-////        System.out.println(principal);
-////        System.out.println(principal.getClass().getName());
-//        if (!authenticated) {
-//            System.out.println("Not authenticated");
-//        } else {
-//            System.out.println("Authenticated");
-//        }
-        if (principalDetails == null) {
-            System.out.println("principal details is null");
-        } else {
-            System.out.println("principal details is " + principalDetails);
-        }
-
-        return null;
-    }
+//    @GetMapping("{studyId}/submissions")
+//    public ResponseEntity<SubmissionResponse> getSubmission(
+//            @PathVariable Long studyId,
+//    ) {
+//
+//        return ResponseEntity.ok(studyService.);
+//    }
 }

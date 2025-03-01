@@ -1,5 +1,6 @@
 package com.seungjoon.algo.recruit.dto;
 
+import com.seungjoon.algo.recruit.domain.RecruitPost;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,10 @@ public class RecruitPostSliceResponse {
     private Boolean hasNext;
     private List<RecruitPostResponse> posts;
 
-    public static RecruitPostSliceResponse of(Boolean hasNext, List<RecruitPostResponse> posts) {
-        return new RecruitPostSliceResponse(hasNext, posts);
+    public static RecruitPostSliceResponse of(Boolean hasNext, List<RecruitPost> posts) {
+        return new RecruitPostSliceResponse(
+                hasNext,
+                posts.stream().map(RecruitPostResponse::from).toList()
+        );
     }
 }

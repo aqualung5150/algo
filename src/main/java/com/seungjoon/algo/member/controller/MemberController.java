@@ -4,7 +4,6 @@ import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.dto.ProfileResponse;
 import com.seungjoon.algo.member.service.MemberService;
-import com.seungjoon.algo.recruit.dto.RecruitPostPageResponse;
 import com.seungjoon.algo.recruit.dto.RecruitPostSliceResponse;
 import com.seungjoon.algo.recruit.service.RecruitPostService;
 import com.seungjoon.algo.study.dto.StudyPageResponse;
@@ -21,6 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
+/*
+TODO
+회원탈퇴
+ */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
@@ -36,7 +40,6 @@ public class MemberController {
         return ResponseEntity.ok(ProfileResponse.from(member));
     }
 
-    //TODO: test
     @GetMapping("{id}/recruit-posts")
     public ResponseEntity<RecruitPostSliceResponse> getRecruitPosts(
             @PathVariable Long id,
