@@ -11,10 +11,7 @@ import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.*;
-import com.seungjoon.algo.study.dto.CreateStudyRequest;
-import com.seungjoon.algo.study.dto.CreateSubmissionRequest;
-import com.seungjoon.algo.study.dto.StudyPageResponse;
-import com.seungjoon.algo.study.dto.StudyResponse;
+import com.seungjoon.algo.study.dto.*;
 import com.seungjoon.algo.study.repository.BanVoteRepository;
 import com.seungjoon.algo.study.repository.ClosingVoteRepository;
 import com.seungjoon.algo.study.repository.StudyMemberRepository;
@@ -34,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
@@ -79,6 +77,10 @@ public class StudyService {
 
         RecruitPost post = recruitPostRepository.findByIdJoinFetch(request.getRecruitPostId())
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+
+        if (post.getState() == RecruitPostState.COMPLETED) {
+            throw new BadRequestException(RECRUITMENT_FINISHED);
+        }
 
         StudyRule studyRule = post.getStudyRule();
 
@@ -252,6 +254,7 @@ public class StudyService {
                 .content(request.getContent())
                 .subjectNumber(request.getSubjectNumber())
                 .visibility(SubmissionVisibility.valueOf(request.getVisibility()))
+                .weekNumber(getCurrentWeek(study))
                 .build());
 
         List<SubmissionTag> submissionTags = SubmissionTag.toListFromTags(submission, tags);
@@ -267,5 +270,17 @@ public class StudyService {
         if (tags.size() != request.getTags().size()) {
             throw new BadRequestException(INVALID_TAGS);
         }
+    }
+
+    private Integer getCurrentWeek(Study study) {
+        int weekNumber = 1;
+        LocalDate startSubmitDate = study.getFirstSubmitDate();
+        LocalDate nextSubmitDate = LocalDate.now()
+                .with(TemporalAdjusters.nextOrSame(study.getStudyRule().getSubmitDayOfWeek()));
+        while (nextSubmitDate.isAfter(startSubmitDate)) {
+            startSubmitDate = startSubmitDate.plusWeeks(1L);
+            ++weekNumber;
+        }
+        return weekNumber;
     }
 }

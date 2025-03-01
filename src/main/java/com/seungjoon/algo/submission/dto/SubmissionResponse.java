@@ -1,11 +1,11 @@
 package com.seungjoon.algo.submission.dto;
 
+import com.seungjoon.algo.member.dto.ProfileResponse;
 import com.seungjoon.algo.submission.domain.Submission;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -14,9 +14,10 @@ public class SubmissionResponse {
 
     private Long submissionId;
     private Integer subjectNumber;
+    private ProfileResponse profile;
     private String content;
     private String visibility;
-    private LocalDate submissionDate;
+    private Integer weekNumber;
     private List<Long> tags;
 
     public static SubmissionResponse from(Submission submission) {
@@ -24,9 +25,10 @@ public class SubmissionResponse {
         return new SubmissionResponse(
                 submission.getId(),
                 submission.getSubjectNumber(),
+                ProfileResponse.from(submission.getMember()),
                 submission.getContent(),
                 submission.getVisibility().name(),
-                submission.getSubmitDate(),
+                submission.getWeekNumber(),
                 submission.getTags().stream().mapToLong(st -> st.getTag().getId()).boxed().toList()
         );
     }

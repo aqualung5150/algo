@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: 프로그래밍언어 필드?
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,8 +31,7 @@ public class Submission extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SubmissionVisibility visibility;
 
-    @CreatedDate
-    private LocalDate submitDate;
+    private Integer weekNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -45,10 +45,11 @@ public class Submission extends BaseEntity {
     private List<SubmissionTag> tags = new ArrayList<>();
 
     @Builder
-    public Submission(int subjectNumber, String content, SubmissionVisibility visibility, Member member, Study study) {
+    public Submission(int subjectNumber, String content, SubmissionVisibility visibility, Integer weekNumber, Member member, Study study) {
         this.subjectNumber = subjectNumber;
         this.content = content;
         this.visibility = visibility;
+        this.weekNumber = weekNumber;
         this.member = member;
         this.study = study;
     }
