@@ -8,8 +8,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -17,8 +15,6 @@ import java.io.IOException;
 import static com.seungjoon.algo.exception.ExceptionCode.EXPIRED_JWT_TOKEN;
 import static com.seungjoon.algo.exception.ExceptionCode.INVALID_JWT_TOKEN;
 
-@Slf4j
-//@Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

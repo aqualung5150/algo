@@ -35,7 +35,8 @@ public enum ExceptionCode {
     DUPLICATE_BAN_VOTE(1022, "이미 해당 팀원에게 강퇴 투표했습니다."),
     STUDY_CLOSED(1023, "해당 스터디는 종료되었습니다."),
     MEMBER_NOT_IN_STUDY(1024, "스터디의 팀원이 아닙니다."),
-    SAME_VOTER_TARGET(1025, "자신에게 투표할 수 없습니다.");
+    SAME_VOTER_TARGET(1025, "자신에게 투표할 수 없습니다."),
+    PRIVATE_POST(1026, "비공개 게시글입니다.");
 
 
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");
