@@ -4,7 +4,7 @@ import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
-import com.seungjoon.algo.recruit.dto.RecruitPostSearchCondition;
+import com.seungjoon.algo.recruit.dto.RecruitPostCondition;
 import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.domain.StudyRuleTag;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
@@ -94,7 +94,7 @@ class RecruitPostRepositoryTest {
                 "createdDate"
         );
 
-        RecruitPostSearchCondition condition = new RecruitPostSearchCondition();
+        RecruitPostCondition condition = new RecruitPostCondition();
 
         //when
         Page<RecruitPost> posts = recruitPostRepository
@@ -116,7 +116,7 @@ class RecruitPostRepositoryTest {
                 "createdDate"
         );
 
-        RecruitPostSearchCondition condition = new RecruitPostSearchCondition();
+        RecruitPostCondition condition = new RecruitPostCondition();
         condition.setTag(List.of(1L));
 
         //when
@@ -139,17 +139,17 @@ class RecruitPostRepositoryTest {
         );
 
         //when
-        RecruitPostSearchCondition minLevel = new RecruitPostSearchCondition();
+        RecruitPostCondition minLevel = new RecruitPostCondition();
         minLevel.setMinLevel(15);
         Page<RecruitPost> minLevelPosts = recruitPostRepository
                 .findAllByCondition(minLevel, pageRequest);
 
-        RecruitPostSearchCondition maxLevel = new RecruitPostSearchCondition();
+        RecruitPostCondition maxLevel = new RecruitPostCondition();
         maxLevel.setMaxLevel(15);
         Page<RecruitPost> maxLevelPosts = recruitPostRepository
                 .findAllByCondition(maxLevel, pageRequest);
 
-        RecruitPostSearchCondition minMaxLevel = new RecruitPostSearchCondition();
+        RecruitPostCondition minMaxLevel = new RecruitPostCondition();
         minMaxLevel.setMinLevel(15);
         minMaxLevel.setMaxLevel(25);
         Page<RecruitPost> minMaxLevelPosts = recruitPostRepository
@@ -172,7 +172,7 @@ class RecruitPostRepositoryTest {
                 "createdDate"
         );
 
-        RecruitPostSearchCondition condition = new RecruitPostSearchCondition();
+        RecruitPostCondition condition = new RecruitPostCondition();
         condition.setTitle("post3");
 
         //when
@@ -194,7 +194,7 @@ class RecruitPostRepositoryTest {
                 "createdDate"
         );
 
-        RecruitPostSearchCondition condition = new RecruitPostSearchCondition();
+        RecruitPostCondition condition = new RecruitPostCondition();
         condition.setTag(List.of(1L, 3L));
         condition.setTitle("post3");
         condition.setMinLevel(15);
@@ -219,7 +219,7 @@ class RecruitPostRepositoryTest {
                 "createdDate"
         );
 
-        RecruitPostSearchCondition condition = new RecruitPostSearchCondition();
+        RecruitPostCondition condition = new RecruitPostCondition();
         condition.setTag(List.of(1L, 3L));
         condition.setTitle("post");
         condition.setMinLevel(5);

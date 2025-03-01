@@ -16,9 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.DayOfWeek.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
@@ -79,7 +84,7 @@ class StudyServiceTest {
 
     @Test
     void banSameVoterAndTarget() {
-        Assertions.assertThatThrownBy(() -> studyService.banVote(1L, 2L, 2L))
+        assertThatThrownBy(() -> studyService.banVote(1L, 2L, 2L))
                 .isInstanceOf(BadRequestException.class);
     }
 
@@ -120,7 +125,45 @@ class StudyServiceTest {
         //when
 
         //then
-        Assertions.assertThatThrownBy(() -> studyService.banVote(study.getId(), voter.getId(), notInStudy.getId()))
+        assertThatThrownBy(() -> studyService.banVote(study.getId(), voter.getId(), notInStudy.getId()))
                 .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void getCurrentWeek() {
+        //given
+
+        //2025-3-1 토요일
+        LocalDate startSubmitDate = LocalDate.of(2025, 3, 1)
+                .with(TemporalAdjusters.nextOrSame(SUNDAY));
+
+        LocalDate firstSaturday = LocalDate.of(2025, 3, 1)
+                .with(TemporalAdjusters.nextOrSame(SUNDAY));
+
+        LocalDate sameWithStartSubmitDate = LocalDate.of(2025, 3, 2)
+                .with(TemporalAdjusters.nextOrSame(SUNDAY));
+
+        LocalDate thirdMonday = LocalDate.of(2025, 3, 10)
+                .with(TemporalAdjusters.nextOrSame(SUNDAY));
+
+        LocalDate thirdSunday = LocalDate.of(2025, 3, 16)
+                .with(TemporalAdjusters.nextOrSame(SUNDAY));
+
+        //when
+
+        //then
+        assertThat(getCurrentWeek(startSubmitDate, firstSaturday)).isEqualTo(1);
+        assertThat(getCurrentWeek(startSubmitDate, sameWithStartSubmitDate)).isEqualTo(1);
+        assertThat(getCurrentWeek(startSubmitDate, thirdMonday)).isEqualTo(3);
+        assertThat(getCurrentWeek(startSubmitDate, thirdSunday)).isEqualTo(3);
+    }
+
+    private Integer getCurrentWeek(LocalDate startSubmitDate, LocalDate submitDate) {
+        Integer weekNumber = 1;
+        while (submitDate.isAfter(startSubmitDate)) {
+            startSubmitDate = startSubmitDate.plusWeeks(1L);
+            ++weekNumber;
+        }
+        return weekNumber;
     }
 }

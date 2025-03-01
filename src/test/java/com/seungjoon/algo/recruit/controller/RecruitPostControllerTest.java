@@ -48,7 +48,7 @@ class RecruitPostControllerTest {
         CreateRecruitPostRequest createRecruitPostRequest = new CreateRecruitPostRequest(
                 "anyTitle",
                 "anyContent",
-                1,
+                2,
                 10,
                 15,
                 2,

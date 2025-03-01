@@ -3,6 +3,7 @@ package com.seungjoon.algo.recruit.service;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
+import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 
@@ -84,6 +86,7 @@ class RecruitPostServiceTest {
         given(applicantRepository.existsByRecruitPostIdAndMemberId(post.getId(), applicant.getId()))
                 .willReturn(false)
                 .willReturn(true);
+        given(applicantRepository.save(any())).willReturn(Applicant.builder().build());
 
         //when
 

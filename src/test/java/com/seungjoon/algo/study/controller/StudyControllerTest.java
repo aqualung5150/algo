@@ -3,6 +3,7 @@ package com.seungjoon.algo.study.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seungjoon.algo.WithMockMember;
 import com.seungjoon.algo.auth.dto.SignUpRequest;
+import com.seungjoon.algo.auth.jwt.JwtFilter;
 import com.seungjoon.algo.auth.service.AuthService;
 import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
 import com.seungjoon.algo.recruit.service.RecruitPostService;
@@ -14,7 +15,11 @@ import com.seungjoon.algo.submission.domain.Tag;
 import com.seungjoon.algo.submission.repository.TagRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -33,7 +38,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class StudyControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -42,8 +47,11 @@ class StudyControllerTest {
     MockMvc mockMvc;
 
     /* 기존 시큐리티 비활성화 */
-    @MockitoBean
-    SecurityFilterChain securityFilterChain;
+//    @MockitoBean
+//    SecurityFilterChain securityFilterChain;
+
+//    @MockitoBean
+//    JwtFilter jwtFilter;
 
     @Autowired
     StudyService studyService;
@@ -56,14 +64,14 @@ class StudyControllerTest {
     @Autowired
     AuthService authService;
 
-    @TestConfiguration
-    /* 시큐리티 기본 세팅 */
-    static class SecurityTestConfig {
-        @Bean
-        public SecurityFilterChain securityTestFilterChain(HttpSecurity http) throws Exception {
-            return http.build();
-        }
-    }
+//    @TestConfiguration
+//    /* 시큐리티 기본 세팅 */
+//    static class SecurityTestConfig {
+//        @Bean
+//        public SecurityFilterChain securityTestFilterChain(HttpSecurity http) throws Exception {
+//            return http.build();
+//        }
+//    }
 
     @Test
     @WithMockMember

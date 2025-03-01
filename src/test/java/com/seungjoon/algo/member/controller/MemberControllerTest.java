@@ -1,12 +1,15 @@
 package com.seungjoon.algo.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seungjoon.algo.CustomMockUserSecurityContextFactory;
 import com.seungjoon.algo.WithMockMember;
+import com.seungjoon.algo.config.SecurityConfig;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.domain.MemberState;
 import com.seungjoon.algo.member.domain.Role;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
+import com.seungjoon.algo.recruit.domain.RecruitPostState;
 import com.seungjoon.algo.recruit.dto.RecruitPostSliceResponse;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
@@ -14,12 +17,18 @@ import com.seungjoon.algo.study.repository.StudyRuleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,10 +39,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.DayOfWeek;
 
+import static com.seungjoon.algo.recruit.domain.RecruitPostState.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+//@ImportAutoConfiguration(exclude = SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
+//@EnableAutoConfiguration(exclude = {SecurityConfig.class})
+//    @AutoConfiguration()
 class MemberControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -48,17 +61,17 @@ class MemberControllerTest {
     @Autowired
     StudyRuleRepository studyRuleRepository;
 
-    @MockitoBean /* 기존 시큐리티 비활성화 */
-    SecurityFilterChain securityFilterChain;
+//    @MockitoBean /* 기존 시큐리티 비활성화 */
+//    SecurityFilterChain securityFilterChain;
 
-    @TestConfiguration
-    /* 시큐리티 기본 세팅 */
-    static class SecurityTestConfig {
-        @Bean
-        public SecurityFilterChain securityTestFilterChain(HttpSecurity http) throws Exception {
-            return http.build();
-        }
-    }
+//    @TestConfiguration
+//    /* 시큐리티 기본 세팅 */
+//    static class SecurityTestConfig {
+//        @Bean
+//        public SecurityFilterChain securityTestFilterChain(HttpSecurity http) throws Exception {
+//            return http.build();
+//        }
+//    }
 
 //    @BeforeEach
 //    void init() {
@@ -77,7 +90,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @WithMockMember
+//    @WithMockMember
     void getRecruitPosts() throws Exception {
 
         //given
@@ -93,7 +106,7 @@ class MemberControllerTest {
         for (int i = 0; i < 10; ++i) {
             StudyRule studyRule = StudyRule.builder().numberOfMembers(3).submitDayOfWeek(DayOfWeek.FRIDAY).submitPerWeek(3).totalWeek(3).build();
             studyRuleRepository.save(studyRule);
-            RecruitPost recruitPost = RecruitPost.builder().title("post" + i).member(member).studyRule(studyRule).build();
+            RecruitPost recruitPost = RecruitPost.builder().title("post" + i).member(member).studyRule(studyRule).state(RECRUITING).build();
             recruitPostRepository.save(recruitPost);
         }
 
