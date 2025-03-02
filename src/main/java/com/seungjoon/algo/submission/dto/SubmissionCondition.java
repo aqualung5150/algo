@@ -6,4 +6,7 @@ import lombok.Data;
 public class SubmissionCondition {
 
     private Integer subjectNumber;
+    private Long memberId;
+    private Long studyId;
+    private Integer weekNumber;
 }

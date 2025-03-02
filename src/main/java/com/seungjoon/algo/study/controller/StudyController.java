@@ -87,12 +87,4 @@ public class StudyController {
 
         return ResponseEntity.created(URI.create("/study/" + id + "/submissions/" + submissionId)).build();
     }
-
-//    @GetMapping("{studyId}/submissions")
-//    public ResponseEntity<SubmissionResponse> getSubmission(
-//            @PathVariable Long studyId,
-//    ) {
-//
-//        return ResponseEntity.ok(studyService.);
-//    }
 }

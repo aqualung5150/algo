@@ -31,7 +31,12 @@ public class SubmissionRepositoryImpl implements SubmissionRepositoryCustom{
         List<Submission> submissions = queryFactory
                 .selectFrom(submission)
                 .join(submission.member).fetchJoin()
-                .where(subjectNumber(condition.getSubjectNumber()))
+                .where(
+                        subjectNumber(condition.getSubjectNumber()),
+                        memberId(condition.getMemberId()),
+                        studyId(condition.getStudyId()),
+                        weekNumber(condition.getWeekNumber())
+                )
                 .orderBy(QuerydslUtils.getSort(pageable, submission))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -40,12 +45,29 @@ public class SubmissionRepositoryImpl implements SubmissionRepositoryCustom{
         JPAQuery<Long> countQuery = queryFactory
                 .select(submission.count())
                 .from(submission)
-                .where(subjectNumber(condition.getSubjectNumber()));
+                .where(
+                        subjectNumber(condition.getSubjectNumber()),
+                        memberId(condition.getMemberId()),
+                        studyId(condition.getStudyId()),
+                        weekNumber(condition.getWeekNumber())
+                );
 
         return PageableExecutionUtils.getPage(submissions, pageable, countQuery::fetchOne);
     }
 
     private BooleanExpression subjectNumber(Integer subjectNumber) {
         return subjectNumber != null ? submission.subjectNumber.eq(subjectNumber) : null;
+    }
+
+    private BooleanExpression memberId(Long memberId) {
+        return memberId != null ? submission.member.id.eq(memberId) : null;
+    }
+
+    private BooleanExpression studyId(Long studyId) {
+        return studyId != null ? submission.study.id.eq(studyId) : null;
+    }
+
+    private BooleanExpression weekNumber(Integer weekNumber) {
+        return weekNumber != null ? submission.weekNumber.eq(weekNumber) : null;
     }
 }
