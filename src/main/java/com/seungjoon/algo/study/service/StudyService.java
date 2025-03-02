@@ -7,23 +7,16 @@ import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
 import com.seungjoon.algo.recruit.domain.RecruitPostState;
-import com.seungjoon.algo.recruit.dto.CreateRecruitPostRequest;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.*;
-import com.seungjoon.algo.study.dto.*;
+import com.seungjoon.algo.study.dto.CreateStudyRequest;
+import com.seungjoon.algo.study.dto.StudyPageResponse;
+import com.seungjoon.algo.study.dto.StudyResponse;
 import com.seungjoon.algo.study.repository.BanVoteRepository;
 import com.seungjoon.algo.study.repository.ClosingVoteRepository;
 import com.seungjoon.algo.study.repository.StudyMemberRepository;
 import com.seungjoon.algo.study.repository.StudyRepository;
-import com.seungjoon.algo.submission.domain.Submission;
-import com.seungjoon.algo.submission.domain.SubmissionTag;
-import com.seungjoon.algo.submission.domain.SubmissionVisibility;
-import com.seungjoon.algo.submission.domain.Tag;
-import com.seungjoon.algo.submission.repository.SubmissionRepository;
-import com.seungjoon.algo.submission.repository.SubmissionTagRepository;
-import com.seungjoon.algo.submission.repository.TagRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
@@ -88,6 +80,7 @@ public class StudyService {
 
         Study study = studyRepository.save(Study.builder()
                 .name(request.getName())
+                .numberOfMembers(request.getMemberIds().size())
                 .studyRule(post.getStudyRule())
                 .firstSubmitDate(getFirstSubmitDate(studyRule))
                 .lastSubmitDate(getLastSubmitDate(studyRule))
@@ -171,7 +164,7 @@ public class StudyService {
             }
         });
 
-        if (votes.size() + 1L >= study.getStudyMembers().size()) {
+        if (votes.size() + 1L >= study.getNumberOfMembers()) {
             study.changeState(FAILED);
             closingVoteRepository.deleteByStudyId(study.getId());
         } else {
@@ -203,6 +196,8 @@ public class StudyService {
         if (banVoteRepository.existsByStudyIdAndVoterIdAndTargetId(studyId, voterId, targetId)) {
             throw new BadRequestException(DUPLICATE_BAN_VOTE);
         }
+
+        //TODO: 표 >= 멤버수 {강퇴}
 
         banVoteRepository.save(
                 BanVote.builder()

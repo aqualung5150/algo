@@ -25,6 +25,8 @@ public class Study extends BaseEntity {
 
     private String name;
 
+    private Integer numberOfMembers;
+
     private LocalDate firstSubmitDate;
     private LocalDate lastSubmitDate;
 
@@ -39,8 +41,9 @@ public class Study extends BaseEntity {
     private List<StudyMember> studyMembers = new ArrayList<>();
 
     @Builder
-    public Study(String name, LocalDate firstSubmitDate, LocalDate lastSubmitDate, StudyState state, StudyRule studyRule) {
+    public Study(String name, Integer numberOfMembers, LocalDate firstSubmitDate, LocalDate lastSubmitDate, StudyState state, StudyRule studyRule) {
         this.name = name;
+        this.numberOfMembers = numberOfMembers;
         this.firstSubmitDate = firstSubmitDate;
         this.lastSubmitDate = lastSubmitDate;
         this.state = state;
