@@ -41,11 +41,8 @@ public class RecruitPostService {
     private final ApplicantRepository applicantRepository;
     private final StudyRuleRepository studyRuleRepository;
     private final TagRepository tagRepository;
-    private final StudyRuleTagRepository studyRuleTagRepository;
     private final MemberRepository memberRepository;
 
-
-    //TODO: 완료된 모집글에 대한 예외 처리
     @Transactional
     public Long createRecruitPost(Long authId, CreateRecruitPostRequest request) {
 
@@ -71,7 +68,6 @@ public class RecruitPostService {
         RecruitPost saved = recruitPostRepository.save(RecruitPost.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
-                .state(RECRUITING)
                 .studyRule(studyRule)
                 .member(member)
                 .build()
@@ -225,6 +221,10 @@ public class RecruitPostService {
     }
 
     private void validateApplicant(RecruitPost post, Member member) {
+
+        if (post.getState() == RecruitPostState.COMPLETED) {
+            throw new BadRequestException(RECRUITMENT_FINISHED);
+        }
 
         if (post.getMember().getId().equals(member.getId())) {
             throw new BadRequestException(SAME_AUTHOR_APPLICANT);

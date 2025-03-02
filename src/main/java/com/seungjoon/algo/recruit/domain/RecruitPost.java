@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static com.seungjoon.algo.recruit.domain.RecruitPostState.*;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,7 +27,7 @@ public class RecruitPost extends BaseEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private RecruitPostState state;
+    private RecruitPostState state = RECRUITING;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_rule_id")
@@ -36,10 +38,9 @@ public class RecruitPost extends BaseEntity {
     private Member member;
 
     @Builder
-    public RecruitPost(String title, String content, RecruitPostState state, StudyRule studyRule, Member member) {
+    public RecruitPost(String title, String content, StudyRule studyRule, Member member) {
         this.title = title;
         this.content = content;
-        this.state = state;
         this.studyRule = studyRule;
         this.member = member;
     }
