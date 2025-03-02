@@ -27,8 +27,7 @@ import java.util.List;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
 import static com.seungjoon.algo.study.domain.StudyState.IN_PROGRESS;
-import static com.seungjoon.algo.submission.domain.SubmissionState.PASSED;
-import static com.seungjoon.algo.submission.domain.SubmissionState.PENDING;
+import static com.seungjoon.algo.submission.domain.SubmissionState.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -131,18 +130,27 @@ public class SubmissionService {
                 .passFail(PassFail.valueOf(request.getPassFail()))
                 .build());
 
-        updatePassedOrNot(submission, study);
+        updateStateOrNot(submission, study);
 
         return saved.getId();
     }
 
-    private void updatePassedOrNot(Submission submission, Study study) {
-        long passCount = evaluationRepository.findBySubmission(submission).stream()
-                .filter(evaluation -> evaluation.getPassFail() == PassFail.PASS)
-                .count();
-        if (passCount >= study.getNumberOfMembers()) {
-            submission.changeState(PASSED);
+    private void updateStateOrNot(Submission submission, Study study) {
+
+        List<Evaluation> evaluations = evaluationRepository.findBySubmission(submission);
+
+        if (evaluations.size() < study.getNumberOfMembers()) {
+            return;
         }
+
+        for (Evaluation evaluation : evaluations) {
+            if (evaluation.getPassFail() == PassFail.FAIL) {
+                submission.changeState(FAILED);
+                return;
+            }
+        }
+
+        submission.changeState(PASSED);
     }
 
     private void validateDuplicate(Submission submission, Member evaluator) {
