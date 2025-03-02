@@ -51,9 +51,6 @@ public class StudyService {
     private final ClosingVoteRepository closingVoteRepository;
     private final MemberRepository memberRepository;
     private final BanVoteRepository banVoteRepository;
-    private final SubmissionRepository submissionRepository;
-    private final TagRepository tagRepository;
-    private final SubmissionTagRepository submissionTagRepository;
 
     public StudyResponse getStudyById(Long id) {
 
@@ -231,56 +228,5 @@ public class StudyService {
         if (!memberIds.contains(memberId)) {
             throw new BadRequestException(MEMBER_NOT_IN_STUDY);
         }
-    }
-
-    @Transactional
-    public Long submit(Long studyId, Long memberId, @Valid CreateSubmissionRequest request) {
-
-        Study study = studyRepository.findByIdJoinFetch(studyId)
-                .orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
-
-        validateStudyInProgress(study);
-        validateMemberInStudy(study, memberId);
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
-
-        List<Tag> tags = tagRepository.findByIdIn(request.getTags());
-        validateTagsExist(request, tags);
-
-        Submission submission = submissionRepository.save(Submission.builder()
-                .study(study)
-                .member(member)
-                .content(request.getContent())
-                .subjectNumber(request.getSubjectNumber())
-                .visibility(SubmissionVisibility.valueOf(request.getVisibility()))
-                .weekNumber(getCurrentWeek(study))
-                .build());
-
-        List<SubmissionTag> submissionTags = SubmissionTag.toListFromTags(submission, tags);
-        submissionTagRepository.saveAll(submissionTags);
-
-        //TODO: oneToMany를 배치인서트할 지 고민이 된다...
-        submission.addSubmissionTags(submissionTags);
-
-        return submission.getId();
-    }
-
-    private void validateTagsExist(CreateSubmissionRequest request, List<Tag> tags) {
-        if (tags.size() != request.getTags().size()) {
-            throw new BadRequestException(INVALID_TAGS);
-        }
-    }
-
-    private Integer getCurrentWeek(Study study) {
-        int weekNumber = 1;
-        LocalDate startSubmitDate = study.getFirstSubmitDate();
-        LocalDate nextSubmitDate = LocalDate.now()
-                .with(TemporalAdjusters.nextOrSame(study.getStudyRule().getSubmitDayOfWeek()));
-        while (nextSubmitDate.isAfter(startSubmitDate)) {
-            startSubmitDate = startSubmitDate.plusWeeks(1L);
-            ++weekNumber;
-        }
-        return weekNumber;
     }
 }

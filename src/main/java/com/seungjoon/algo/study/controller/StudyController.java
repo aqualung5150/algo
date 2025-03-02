@@ -74,17 +74,4 @@ public class StudyController {
 
         return ResponseEntity.noContent().build();
     }
-
-    /* Submission */
-    @PostMapping("{id}/submissions")
-    public ResponseEntity<Void> createSubmission(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable Long id,
-            @Valid @RequestBody CreateSubmissionRequest request
-    ) {
-
-        Long submissionId = studyService.submit(id, principalDetails.getId(), request);
-
-        return ResponseEntity.created(URI.create("/study/" + id + "/submissions/" + submissionId)).build();
-    }
 }

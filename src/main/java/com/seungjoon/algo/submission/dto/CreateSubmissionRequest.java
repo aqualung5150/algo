@@ -1,4 +1,4 @@
-package com.seungjoon.algo.study.dto;
+package com.seungjoon.algo.submission.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +8,9 @@ import java.util.List;
 
 @Data
 public class CreateSubmissionRequest {
+
+    @NotNull
+    Long studyId;
 
     @NotNull
     Integer subjectNumber;
