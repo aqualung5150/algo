@@ -6,7 +6,6 @@ import com.seungjoon.algo.exception.UnauthorizedException;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.study.domain.Study;
-import com.seungjoon.algo.study.domain.StudyMember;
 import com.seungjoon.algo.study.repository.StudyRepository;
 import com.seungjoon.algo.submission.domain.*;
 import com.seungjoon.algo.submission.dto.*;
@@ -58,14 +57,8 @@ public class SubmissionService {
             throw new UnauthorizedException(PRIVATE_POST);
         }
 
-        List<Long> members = submission.getStudy()
-                .getStudyMembers().stream()
-                .mapToLong(StudyMember::getId).boxed()
-                .toList();
-
-        if (!members.contains(submission.getId())) {
-            throw new UnauthorizedException(PRIVATE_POST);
-        }
+        Study study = submission.getStudy();
+        validateMemberInStudy(study, auth.getId());
     }
 
     public SubmissionPageResponse getSubmissions(SubmissionCondition condition, Pageable pageable) {
@@ -121,7 +114,7 @@ public class SubmissionService {
 
         validateMemberInStudy(study, evaluator.getId());
 
-        validateDuplicate(submission, evaluator);
+        validateDuplicateEvaluation(submission, evaluator);
 
         Evaluation saved = evaluationRepository.save(Evaluation.builder()
                 .submission(submission)
@@ -153,7 +146,7 @@ public class SubmissionService {
         submission.changeState(PASSED);
     }
 
-    private void validateDuplicate(Submission submission, Member evaluator) {
+    private void validateDuplicateEvaluation(Submission submission, Member evaluator) {
         if (evaluationRepository.existsBySubmissionAndMember(submission, evaluator)) {
             throw new BadRequestException(DUPLICATE_EVALUATION);
         }
@@ -192,5 +185,18 @@ public class SubmissionService {
             ++weekNumber;
         }
         return weekNumber;
+    }
+
+    public EvaluationsResponse getEvaluations(Long submissionId, Long authId) {
+
+        Submission submission = submissionRepository.findByIdJoinFetchStudy(submissionId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
+        Study study = submission.getStudy();
+
+        validateMemberInStudy(study, authId);
+
+        List<Evaluation> evaluations = evaluationRepository.findBySubmission(submission);
+
+        return EvaluationsResponse.from(evaluations);
     }
 }

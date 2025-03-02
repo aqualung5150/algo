@@ -1,7 +1,6 @@
 package com.seungjoon.algo.submission.controller;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
-import com.seungjoon.algo.study.service.StudyService;
 import com.seungjoon.algo.submission.dto.*;
 import com.seungjoon.algo.submission.service.SubmissionService;
 import jakarta.validation.Valid;
@@ -21,7 +20,6 @@ import java.net.URI;
 public class SubmissionController {
 
     private final SubmissionService submissionService;
-    private final StudyService studyService;
 
     @PostMapping
     public ResponseEntity<Void> submit(
@@ -47,6 +45,15 @@ public class SubmissionController {
     ) {
 
         return ResponseEntity.ok(submissionService.getSubmissionById(principalDetails, id));
+    }
+
+    //TODO
+    @GetMapping("{id}/evaluations")
+    public ResponseEntity<EvaluationsResponse> getEvaluations(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(submissionService.getEvaluations(id, principalDetails.getId()));
     }
 
     @PostMapping("{id}/evaluations")
