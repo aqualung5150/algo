@@ -36,8 +36,10 @@ public enum ExceptionCode {
     STUDY_CLOSED(1023, "해당 스터디는 종료되었습니다."),
     MEMBER_NOT_IN_STUDY(1024, "스터디의 팀원이 아닙니다."),
     SAME_VOTER_TARGET(1025, "자신에게 투표할 수 없습니다."),
-    PRIVATE_POST(1026, "비공개 게시글입니다.");
-
+    PRIVATE_POST(1026, "비공개 게시글입니다."),
+    DUPLICATE_EVALUATION(1027, "이미 평가가 존재합니다."),
+    NOT_FOUND_SUBMISSION(1028, "존재하지 않는 제출입니다."),
+    PASSED_SUBMISSION(1029, "이미 통과한 제출입니다.");
 
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");
 

@@ -44,6 +44,9 @@ public class Submission extends BaseEntity {
     @OneToMany(mappedBy = "submission")
     private List<SubmissionTag> tags = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private SubmissionState state = SubmissionState.PENDING;
+
     @Builder
     public Submission(int subjectNumber, String content, SubmissionVisibility visibility, Integer weekNumber, Member member, Study study) {
         this.subjectNumber = subjectNumber;
@@ -56,5 +59,9 @@ public class Submission extends BaseEntity {
 
     public void addSubmissionTags(List<SubmissionTag> submissionTags) {
         this.tags.addAll(submissionTags);
+    }
+
+    public void changeState(SubmissionState state) {
+        this.state = state;
     }
 }

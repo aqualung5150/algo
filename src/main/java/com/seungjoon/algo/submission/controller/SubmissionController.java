@@ -1,10 +1,8 @@
 package com.seungjoon.algo.submission.controller;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
-import com.seungjoon.algo.submission.dto.CreateSubmissionRequest;
-import com.seungjoon.algo.submission.dto.SubmissionCondition;
-import com.seungjoon.algo.submission.dto.SubmissionPageResponse;
-import com.seungjoon.algo.submission.dto.SubmissionResponse;
+import com.seungjoon.algo.study.service.StudyService;
+import com.seungjoon.algo.submission.dto.*;
 import com.seungjoon.algo.submission.service.SubmissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,16 @@ import java.net.URI;
 public class SubmissionController {
 
     private final SubmissionService submissionService;
+    private final StudyService studyService;
+
+    @PostMapping
+    public ResponseEntity<Void> submit(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody CreateSubmissionRequest request
+    ) {
+        Long submitId = submissionService.submit(principalDetails.getId(), request);
+        return ResponseEntity.created(URI.create("/submissions/" + submitId)).build();
+    }
 
     @GetMapping
     public ResponseEntity<SubmissionPageResponse> getSubmissions(
@@ -41,12 +49,14 @@ public class SubmissionController {
         return ResponseEntity.ok(submissionService.getSubmissionById(principalDetails, id));
     }
 
-    @PostMapping
-    public ResponseEntity<Void> submit(
+    @PostMapping("{id}/evaluations")
+    public ResponseEntity<Void> evaluate(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @Valid @RequestBody CreateSubmissionRequest request
+            @PathVariable Long id,
+            @Valid @RequestBody CreateEvaluationRequest request
     ) {
-        Long submitId = submissionService.submit(principalDetails.getId(), request);
-        return ResponseEntity.created(URI.create("/submissions/" + submitId)).build();
+
+        Long evaluationId = submissionService.evaluate(id, principalDetails.getId(), request);
+        return ResponseEntity.created(URI.create("/submissions/" + id + "/evaluations/" + evaluationId)).build();
     }
 }

@@ -7,15 +7,10 @@ import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.study.domain.Study;
 import com.seungjoon.algo.study.domain.StudyMember;
-import com.seungjoon.algo.submission.dto.CreateSubmissionRequest;
 import com.seungjoon.algo.study.repository.StudyRepository;
-import com.seungjoon.algo.submission.domain.Submission;
-import com.seungjoon.algo.submission.domain.SubmissionTag;
-import com.seungjoon.algo.submission.domain.SubmissionVisibility;
-import com.seungjoon.algo.submission.domain.Tag;
-import com.seungjoon.algo.submission.dto.SubmissionCondition;
-import com.seungjoon.algo.submission.dto.SubmissionPageResponse;
-import com.seungjoon.algo.submission.dto.SubmissionResponse;
+import com.seungjoon.algo.submission.domain.*;
+import com.seungjoon.algo.submission.dto.*;
+import com.seungjoon.algo.submission.repository.EvaluationRepository;
 import com.seungjoon.algo.submission.repository.SubmissionRepository;
 import com.seungjoon.algo.submission.repository.SubmissionTagRepository;
 import com.seungjoon.algo.submission.repository.TagRepository;
@@ -31,8 +26,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
-import static com.seungjoon.algo.exception.ExceptionCode.NOT_FOUND_MEMBER;
 import static com.seungjoon.algo.study.domain.StudyState.IN_PROGRESS;
+import static com.seungjoon.algo.submission.domain.SubmissionState.PASSED;
+import static com.seungjoon.algo.submission.domain.SubmissionState.PENDING;
 
 @Service
 @Transactional(readOnly = true)
@@ -44,19 +40,20 @@ public class SubmissionService {
     private final StudyRepository studyRepository;
     private final MemberRepository memberRepository;
     private final TagRepository tagRepository;
+    private final EvaluationRepository evaluationRepository;
 
     public SubmissionResponse getSubmissionById(PrincipalDetails auth, Long id) {
 
-        Submission submission = submissionRepository.findByIdJoinFetchMember(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+        Submission submission = submissionRepository.findByIdJoinFetchMember(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
 
         if (submission.getVisibility() == SubmissionVisibility.PRIVATE) {
-            validateAccessible(auth, submission);
+            validatePrivateAccessible(auth, submission);
         }
 
         return SubmissionResponse.from(submission);
     }
 
-    private void validateAccessible(PrincipalDetails auth, Submission submission) {
+    private void validatePrivateAccessible(PrincipalDetails auth, Submission submission) {
 
         if (auth == null) {
             throw new UnauthorizedException(PRIVATE_POST);
@@ -109,6 +106,49 @@ public class SubmissionService {
         submission.addSubmissionTags(submissionTags);
 
         return submission.getId();
+    }
+
+    @Transactional
+    public Long evaluate(Long submissionId, Long evaluatorId, CreateEvaluationRequest request) {
+
+
+        Member evaluator = memberRepository.findById(evaluatorId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
+        Submission submission = submissionRepository.findByIdJoinFetchStudy(submissionId).orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
+        Study study = submission.getStudy();
+
+        if (submission.getState() != PENDING) {
+            throw new BadRequestException(PASSED_SUBMISSION);
+        }
+
+        validateMemberInStudy(study, evaluator.getId());
+
+        validateDuplicate(submission, evaluator);
+
+        Evaluation saved = evaluationRepository.save(Evaluation.builder()
+                .submission(submission)
+                .member(evaluator)
+                .content(request.getContent())
+                .passFail(PassFail.valueOf(request.getPassFail()))
+                .build());
+
+        updatePassedOrNot(submission, study);
+
+        return saved.getId();
+    }
+
+    private void updatePassedOrNot(Submission submission, Study study) {
+        long passCount = evaluationRepository.findBySubmission(submission).stream()
+                .filter(evaluation -> evaluation.getPassFail() == PassFail.PASS)
+                .count();
+        if (passCount >= study.getNumberOfMembers()) {
+            submission.changeState(PASSED);
+        }
+    }
+
+    private void validateDuplicate(Submission submission, Member evaluator) {
+        if (evaluationRepository.existsBySubmissionAndMember(submission, evaluator)) {
+            throw new BadRequestException(DUPLICATE_EVALUATION);
+        }
     }
 
     private void validateStudyInProgress(Study study) {

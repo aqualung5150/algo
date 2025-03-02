@@ -10,4 +10,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long>, S
 
     @Query("select s from Submission s join fetch s.member where s.id = :id")
     Optional<Submission> findByIdJoinFetchMember(Long id);
+
+    @Query("select s from Submission s" +
+            " join fetch s.study st" +
+//            " join fetch st.studyRule" +
+            " where s.id = :id")
+    Optional<Submission> findByIdJoinFetchStudy(Long id);
 }
