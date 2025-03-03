@@ -37,7 +37,7 @@ public class Study extends BaseEntity {
     @JoinColumn(name = "study_rule_id")
     private StudyRule studyRule;
 
-    @OneToMany
+    @OneToMany(mappedBy = "study")
     private List<StudyMember> studyMembers = new ArrayList<>();
 
     @Builder
@@ -56,5 +56,9 @@ public class Study extends BaseEntity {
 
     public void changeState(StudyState state) {
         this.state = state;
+    }
+
+    public void changeNumberOfMembers(int numberOfMembers) {
+        this.numberOfMembers = numberOfMembers;
     }
 }

@@ -39,7 +39,7 @@ public enum ExceptionCode {
     PRIVATE_POST(1026, "비공개 게시글입니다."),
     DUPLICATE_EVALUATION(1027, "이미 평가가 존재합니다."),
     NOT_FOUND_SUBMISSION(1028, "존재하지 않는 제출입니다."),
-    PASSED_SUBMISSION(1029, "이미 통과한 제출입니다.");
+    SELF_EVALUATE(1029, "자신의 제출을 평가할 수 없습니다.");
 
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");
 

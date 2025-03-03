@@ -6,6 +6,7 @@ import com.seungjoon.algo.exception.UnauthorizedException;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.study.domain.Study;
+import com.seungjoon.algo.study.domain.StudyMember;
 import com.seungjoon.algo.study.repository.StudyRepository;
 import com.seungjoon.algo.submission.domain.*;
 import com.seungjoon.algo.submission.dto.*;
@@ -23,8 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Optional;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.study.domain.StudyMemberState.BANNED;
 import static com.seungjoon.algo.study.domain.StudyState.IN_PROGRESS;
 import static com.seungjoon.algo.submission.domain.SubmissionState.*;
 
@@ -103,13 +106,12 @@ public class SubmissionService {
     @Transactional
     public Long evaluate(Long submissionId, Long evaluatorId, CreateEvaluationRequest request) {
 
-
         Member evaluator = memberRepository.findById(evaluatorId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
         Submission submission = submissionRepository.findByIdJoinFetchStudy(submissionId).orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
         Study study = submission.getStudy();
 
-        if (submission.getState() != PENDING) {
-            throw new BadRequestException(PASSED_SUBMISSION);
+        if (submission.getMember().getId().equals(evaluator.getId())) {
+            throw new BadRequestException(SELF_EVALUATE);
         }
 
         validateMemberInStudy(study, evaluator.getId());
@@ -160,11 +162,10 @@ public class SubmissionService {
 
     private void validateMemberInStudy(Study study, Long memberId) {
 
-        List<Long> memberIds = study.getStudyMembers().stream()
-                .mapToLong(studyMember -> studyMember.getMember().getId())
-                .boxed().toList();
+        Optional<StudyMember> result = study.getStudyMembers().stream()
+                .filter(studyMember -> studyMember.getMember().getId().equals(memberId)).findFirst();
 
-        if (!memberIds.contains(memberId)) {
+        if (result.isEmpty() || result.get().getState() == BANNED) {
             throw new BadRequestException(MEMBER_NOT_IN_STUDY);
         }
     }
