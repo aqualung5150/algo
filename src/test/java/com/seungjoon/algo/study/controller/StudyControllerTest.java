@@ -10,25 +10,17 @@ import com.seungjoon.algo.recruit.service.RecruitPostService;
 import com.seungjoon.algo.study.domain.Study;
 import com.seungjoon.algo.study.dto.CreateStudyRequest;
 import com.seungjoon.algo.study.repository.StudyRepository;
-import com.seungjoon.algo.study.service.StudyService;
 import com.seungjoon.algo.submission.domain.Tag;
 import com.seungjoon.algo.submission.repository.TagRepository;
+import jakarta.servlet.FilterChain;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -37,8 +29,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.willAnswer;
+
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 class StudyControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -46,15 +41,9 @@ class StudyControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    /* 기존 시큐리티 비활성화 */
-//    @MockitoBean
-//    SecurityFilterChain securityFilterChain;
+    @MockitoBean
+    JwtFilter jwtFilter;
 
-//    @MockitoBean
-//    JwtFilter jwtFilter;
-
-    @Autowired
-    StudyService studyService;
     @Autowired
     StudyRepository studyRepository;
     @Autowired
@@ -64,17 +53,17 @@ class StudyControllerTest {
     @Autowired
     AuthService authService;
 
-//    @TestConfiguration
-//    /* 시큐리티 기본 세팅 */
-//    static class SecurityTestConfig {
-//        @Bean
-//        public SecurityFilterChain securityTestFilterChain(HttpSecurity http) throws Exception {
-//            return http.build();
-//        }
-//    }
+    @BeforeEach
+    void init() throws Exception {
+        willAnswer(invocation -> {
+            FilterChain filterChain = invocation.getArgument(2);
+            filterChain.doFilter(invocation.getArgument(0), invocation.getArgument(1));
+            return null;
+        }).given(jwtFilter).doFilter(any(), any(), any());
+    }
 
     @Test
-    @WithMockMember
+    @WithMockMember(id = 1)
     void createStudy() throws Exception {
         //given
         tagRepository.save(new Tag(1L, "dp"));
@@ -113,7 +102,7 @@ class StudyControllerTest {
 
         ResultActions actions = mockMvc.perform(
                 MockMvcRequestBuilders.post("/study")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+//                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createStudyRequest))
         );
