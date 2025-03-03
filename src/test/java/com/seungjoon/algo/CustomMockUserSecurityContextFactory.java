@@ -13,7 +13,7 @@ public class CustomMockUserSecurityContextFactory implements WithSecurityContext
     public SecurityContext createSecurityContext(WithMockMember annotation) {
 
         PrincipalDto principalDto = PrincipalDto.builder()
-                .id(Long.parseLong(annotation.id()))
+                .id(annotation.id())
                 .role(annotation.role())
                 .password("1234")
                 .name("test-name")

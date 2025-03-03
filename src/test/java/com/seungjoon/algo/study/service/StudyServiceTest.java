@@ -59,6 +59,7 @@ class StudyServiceTest {
 
         Study study = Study.builder()
                 .state(StudyState.IN_PROGRESS)
+                .numberOfMembers(3)
                 .build();
         ReflectionTestUtils.setField(study, "id", 1L);
 

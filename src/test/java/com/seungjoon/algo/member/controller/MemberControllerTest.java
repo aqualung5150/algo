@@ -106,7 +106,7 @@ class MemberControllerTest {
         for (int i = 0; i < 10; ++i) {
             StudyRule studyRule = StudyRule.builder().numberOfMembers(3).submitDayOfWeek(DayOfWeek.FRIDAY).submitPerWeek(3).totalWeek(3).build();
             studyRuleRepository.save(studyRule);
-            RecruitPost recruitPost = RecruitPost.builder().title("post" + i).member(member).studyRule(studyRule).state(RECRUITING).build();
+            RecruitPost recruitPost = RecruitPost.builder().title("post" + i).member(member).studyRule(studyRule).build();
             recruitPostRepository.save(recruitPost);
         }
 
