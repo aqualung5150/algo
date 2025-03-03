@@ -62,7 +62,6 @@ public class StudyService {
         return StudyPageResponse.of(studies.getTotalElements(), studies.getContent());
     }
 
-    //TODO: 팀 인원 어떻게 | 멤버id 중복 못 넣게
     @Transactional
     public Long createStudy(Long authId, CreateStudyRequest request) {
 
@@ -75,10 +74,10 @@ public class StudyService {
 
         StudyRule studyRule = post.getStudyRule();
 
-        validateAuthorization(authId, post);
+        validateAuthor(authId, post);
         validateNumberOfMembers(request.getMemberIds(), post);
         List<Applicant> applicants = applicantRepository.findAllByPostIdJoinFetchMember(post.getId());
-        validateApplicants(request.getMemberIds(), applicants);
+        validateApplicants(authId, request.getMemberIds(), applicants);
 
         Study study = studyRepository.save(Study.builder()
                 .name(request.getName())
@@ -94,11 +93,12 @@ public class StudyService {
         study.addStudyMembers(studyMembers);
 
         post.changeRecruitPostState(RecruitPostState.COMPLETED);
+        //TODO: Applicant 삭제?
 
         return study.getId();
     }
 
-    private void validateAuthorization(Long authId, RecruitPost post) {
+    private void validateAuthor(Long authId, RecruitPost post) {
         if (!post.getMember().getId().equals(authId)) {
             throw new UnauthorizedException(NOT_OWN_RESOURCE);
         }
@@ -111,10 +111,15 @@ public class StudyService {
         }
     }
 
-    private void validateApplicants(List<Long> memberIds, List<Applicant> applicants) {
+    private void validateApplicants(Long authId, List<Long> memberIds, List<Applicant> applicants) {
 
-        applicants.forEach(applicant -> {
-            if (!memberIds.contains(applicant.getMember().getId())) {
+        List<Long> applicantIds = applicants.stream()
+                .mapToLong(applicant -> applicant.getMember().getId())
+                .boxed()
+                .toList();
+
+        memberIds.forEach(memberId -> {
+            if (!memberId.equals(authId) && !applicantIds.contains(memberId)) {
                 throw new BadRequestException(INVALID_APPLICANTS_SELECTION);
             }
         });

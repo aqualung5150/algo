@@ -3,6 +3,7 @@ package com.seungjoon.algo.study.service;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
+import com.seungjoon.algo.recruit.domain.Applicant;
 import com.seungjoon.algo.study.domain.Study;
 import com.seungjoon.algo.study.domain.StudyMember;
 import com.seungjoon.algo.study.domain.StudyState;
@@ -11,20 +12,25 @@ import com.seungjoon.algo.study.repository.StudyRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static java.time.DayOfWeek.*;
+import static com.seungjoon.algo.exception.ExceptionCode.INVALID_APPLICANTS_SELECTION;
+import static java.time.DayOfWeek.SUNDAY;
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -166,5 +172,34 @@ class StudyServiceTest {
             ++weekNumber;
         }
         return weekNumber;
+    }
+
+    @Test
+    void memberInApplicantList() {
+        Long authId = 1L;
+        List<Long> memberIds = List.of(1L, 2L, 3L);
+        List<Long> applicantIds = List.of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L);
+
+        memberIds.forEach(memberId -> {
+            if (!memberId.equals(authId) && !applicantIds.contains(memberId)) {
+                throw new BadRequestException(INVALID_APPLICANTS_SELECTION);
+            }
+        });
+    }
+
+    @Test
+    void memberNotInApplicantList() {
+        Long authId = 1L;
+        List<Long> memberIds = List.of(1L, 2L, 20L, 30L);
+        List<Long> applicantIds = List.of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L);
+
+        assertThatThrownBy(() -> memberIds.forEach(memberId -> {
+            if (!memberId.equals(authId) && !applicantIds.contains(memberId)) {
+                throw new BadRequestException(INVALID_APPLICANTS_SELECTION);
+            }
+        }))
+                .isInstanceOf(BadRequestException.class)
+                .extracting("code")
+                .isEqualTo(1018);
     }
 }
