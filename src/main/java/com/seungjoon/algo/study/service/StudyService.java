@@ -26,8 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Optional;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.study.domain.StudyMemberState.*;
 import static com.seungjoon.algo.study.domain.StudyState.FAILED;
 import static com.seungjoon.algo.study.domain.StudyState.IN_PROGRESS;
 
@@ -149,10 +151,12 @@ public class StudyService {
     }
 
     @Transactional
-    public void voteClosing(Long studyId, Long memberId) {
+    public void closingVote(Long studyId, Long memberId) {
 
         Study study = studyRepository.findByIdJoinFetch(studyId).orElseThrow(() -> new BadRequestException(NOT_FOUND_STUDY));
+
         validateStudyInProgress(study);
+        validateMemberInStudy(study, memberId);
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
 
@@ -197,15 +201,35 @@ public class StudyService {
             throw new BadRequestException(DUPLICATE_BAN_VOTE);
         }
 
-        //TODO: 표 >= 멤버수 {강퇴}
+        List<BanVote> targetReceived = banVoteRepository.findByTarget(target);
+        if (study.getNumberOfMembers() > 2 && targetReceived.size() >= study.getNumberOfMembers() - 2) {
 
-        banVoteRepository.save(
-                BanVote.builder()
-                        .study(study)
-                        .voter(voter)
-                        .target(target)
-                        .build()
-        );
+            updateTargetBanned(study, target.getId());
+
+            study.changeNumberOfMembers(study.getNumberOfMembers() - 1);
+
+            /* 스터디의 모든 투표 초기화 */
+            closingVoteRepository.deleteByStudyId(study.getId());
+            banVoteRepository.deleteByStudyId(study.getId());
+
+        } else {
+
+            banVoteRepository.save(
+                    BanVote.builder()
+                            .study(study)
+                            .voter(voter)
+                            .target(target)
+                            .build()
+            );
+        }
+    }
+
+    private void updateTargetBanned(Study study, Long targetId) {
+        StudyMember studyTarget = study.getStudyMembers().stream()
+                .filter(studyMember -> studyMember.getMember().getId().equals(targetId))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
+        studyTarget.changeState(BANNED);
     }
 
     private void validateStudyInProgress(Study study) {
@@ -216,12 +240,19 @@ public class StudyService {
 
     private void validateMemberInStudy(Study study, Long memberId) {
 
-        List<Long> memberIds = study.getStudyMembers().stream()
-                .mapToLong(studyMember -> studyMember.getMember().getId())
-                .boxed().toList();
+        Optional<StudyMember> result = study.getStudyMembers().stream()
+                .filter(studyMember -> studyMember.getMember().getId().equals(memberId)).findFirst();
 
-        if (!memberIds.contains(memberId)) {
+        if (result.isEmpty() || result.get().getState() == BANNED) {
             throw new BadRequestException(MEMBER_NOT_IN_STUDY);
         }
+
+//        List<Long> memberIds = studyMembers.stream()
+//                .mapToLong(studyMember -> studyMember.getMember().getId())
+//                .boxed().toList();
+//
+//        if (!memberIds.contains(memberId)) {
+//            throw new BadRequestException(MEMBER_NOT_IN_STUDY);
+//        }
     }
 }

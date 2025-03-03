@@ -41,4 +41,8 @@ public class StudyMember {
         this.study = study;
         this.member = member;
     }
+
+    public void changeState(StudyMemberState state) {
+        this.state = state;
+    }
 }
