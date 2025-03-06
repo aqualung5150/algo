@@ -1,7 +1,8 @@
 # 서비스 아키텍처
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/6813c64b-c180-4da4-b5c2-bde4373dd994" width="60%"/>
+<img src="https://github.com/user-attachments/assets/5182fc3f-2917-4697-8652-232b7555d5fb" width="60%"/>
+
 </p>
 
 # ERD
