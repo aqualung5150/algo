@@ -25,10 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.study.domain.StudyMemberRole.*;
 import static com.seungjoon.algo.study.domain.StudyMemberState.*;
 import static com.seungjoon.algo.study.domain.StudyState.FAILED;
 import static com.seungjoon.algo.study.domain.StudyState.IN_PROGRESS;
@@ -67,17 +69,23 @@ public class StudyService {
 
         RecruitPost post = recruitPostRepository.findByIdJoinFetch(request.getRecruitPostId())
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
-
+        Member author = post.getMember();
+        StudyRule studyRule = post.getStudyRule();
+        
         if (post.getState() == RecruitPostState.COMPLETED) {
             throw new BadRequestException(RECRUITMENT_FINISHED);
         }
+        
+        if (!author.getId().equals(authId)) {
+            throw new UnauthorizedException(NOT_OWN_RESOURCE);
+        }
 
-        StudyRule studyRule = post.getStudyRule();
-
-        validateAuthor(authId, post);
-        validateNumberOfMembers(request.getMemberIds(), post);
+        if (studyRule.getNumberOfMembers() < request.getMemberIds().size()) {
+            throw new BadRequestException(INVALID_NUMBER_OF_MEMBERS);
+        }
+        
         List<Applicant> applicants = applicantRepository.findAllByPostIdJoinFetchMember(post.getId());
-        validateApplicants(authId, request.getMemberIds(), applicants);
+        validateApplicants(request.getMemberIds(), applicants, author);
 
         Study study = studyRepository.save(Study.builder()
                 .name(request.getName())
@@ -88,7 +96,7 @@ public class StudyService {
                 .state(IN_PROGRESS)
                 .build());
 
-        List<StudyMember> studyMembers = createStudyMembers(study, applicants, authId);
+        List<StudyMember> studyMembers = createStudyMembers(study, author, applicants);
 
         study.addStudyMembers(studyMembers);
 
@@ -98,45 +106,40 @@ public class StudyService {
         return study.getId();
     }
 
-    private void validateAuthor(Long authId, RecruitPost post) {
-        if (!post.getMember().getId().equals(authId)) {
-            throw new UnauthorizedException(NOT_OWN_RESOURCE);
-        }
-    }
-
-    private void validateNumberOfMembers(List<Long> memberIds, RecruitPost post) {
-
-        if (post.getStudyRule().getNumberOfMembers() < memberIds.size()) {
-            throw new BadRequestException(INVALID_NUMBER_OF_MEMBERS);
-        }
-    }
-
-    private void validateApplicants(Long authId, List<Long> memberIds, List<Applicant> applicants) {
+    private void validateApplicants(List<Long> claimedMembers, List<Applicant> applicants, Member author) {
 
         List<Long> applicantIds = applicants.stream()
                 .mapToLong(applicant -> applicant.getMember().getId())
                 .boxed()
                 .toList();
 
-        memberIds.forEach(memberId -> {
-            if (!memberId.equals(authId) && !applicantIds.contains(memberId)) {
+        claimedMembers.forEach(memberId -> {
+            if (!memberId.equals(author.getId()) && !applicantIds.contains(memberId)) {
                 throw new BadRequestException(INVALID_APPLICANTS_SELECTION);
             }
         });
     }
 
-    private List<StudyMember> createStudyMembers(Study study, List<Applicant> applicants, Long authId) {
-        return applicants.stream().map(applicant ->
-                studyMemberRepository.save(StudyMember.builder()
-                        .member(applicant.getMember())
-                        .study(study)
-                        .role(
-                                authId.equals(applicant.getMember().getId()) ?
-                                        StudyMemberRole.LEADER :
-                                        StudyMemberRole.MEMBER
-                        )
-                        .build())
-        ).toList();
+    private List<StudyMember> createStudyMembers(Study study, Member author, List<Applicant> applicants) {
+        
+        List<StudyMember> studyMembers = new ArrayList<>();
+
+        studyMembers.add(studyMemberRepository.save(StudyMember.builder()
+                .member(author)
+                .study(study)
+                .role(LEADER)
+                .build()));
+
+        applicants.forEach(applicant -> {
+                    studyMembers.add(studyMemberRepository.save(StudyMember.builder()
+                            .member(applicant.getMember())
+                            .study(study)
+                            .role(MEMBER)
+                            .build()));
+                }
+        );
+
+        return studyMembers;
     }
 
     private LocalDate getFirstSubmitDate(StudyRule studyRule) {
