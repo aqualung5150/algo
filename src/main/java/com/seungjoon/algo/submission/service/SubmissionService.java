@@ -146,7 +146,7 @@ public class SubmissionService {
 
         List<Evaluation> evaluations = evaluationRepository.findBySubmission(submission);
 
-        if (evaluations.size() < study.getNumberOfMembers()) {
+        if (evaluations.size() < study.getNumberOfMembers() - 1) {
             return;
         }
 
