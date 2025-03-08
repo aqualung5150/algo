@@ -85,13 +85,16 @@ public class SubmissionService {
         List<Tag> tags = tagRepository.findByIdIn(request.getTags());
         validateTagsExist(request, tags);
 
+        Integer weekNumber = getCurrentWeek(study);
+        validateMaxLimit(study, member, weekNumber);
+
         Submission submission = submissionRepository.save(Submission.builder()
                 .study(study)
                 .member(member)
                 .content(request.getContent())
                 .subjectNumber(request.getSubjectNumber())
                 .visibility(SubmissionVisibility.valueOf(request.getVisibility()))
-                .weekNumber(getCurrentWeek(study))
+                .weekNumber(weekNumber)
                 .build());
 
         List<SubmissionTag> submissionTags = SubmissionTag.toListFromTags(submission, tags);
@@ -128,6 +131,15 @@ public class SubmissionService {
         updateStateOrNot(submission, study);
 
         return saved.getId();
+    }
+
+    private void validateMaxLimit(Study study, Member member, Integer weekNumber) {
+
+        long count = submissionRepository.countByWeek(study.getId(), member.getId(), weekNumber);
+
+        if (count >= study.getStudyRule().getSubmitPerWeek()) {
+            throw new BadRequestException(SUBMISSION_LIMIT_EXCEEDED);
+        }
     }
 
     private void updateStateOrNot(Submission submission, Study study) {

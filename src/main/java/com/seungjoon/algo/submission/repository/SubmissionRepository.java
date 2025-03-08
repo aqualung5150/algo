@@ -16,4 +16,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long>, S
 //            " join fetch st.studyRule" +
             " where s.id = :id")
     Optional<Submission> findByIdJoinFetchStudy(Long id);
+
+    @Query("select count(s) from Submission s" +
+            " where s.member.id = :memberId" +
+            " and s.study.id = :studyId" +
+            " and s.weekNumber = :weekNumber")
+    long countByWeek(Long studyId, Long memberId, Integer weekNumber);
 }

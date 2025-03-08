@@ -47,7 +47,6 @@ public class SubmissionController {
         return ResponseEntity.ok(submissionService.getSubmissionById(principalDetails, id));
     }
 
-    //TODO
     @GetMapping("{id}/evaluations")
     public ResponseEntity<EvaluationsResponse> getEvaluations(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
