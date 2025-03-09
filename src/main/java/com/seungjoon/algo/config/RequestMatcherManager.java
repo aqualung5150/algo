@@ -55,7 +55,10 @@ public class RequestMatcherManager {
             //submission
             req(GET, "/submissions", null),
             req(GET, "/submissions/*", null),
-            req(GET, "/submissions/*/evaluations", MEMBER)
+            req(GET, "/submissions/*/evaluations", MEMBER),
+
+            //image
+            req(POST, "/image", MEMBER)
     );
 
     private record RequestInfo(HttpMethod method, String pattern, Role minRole) {

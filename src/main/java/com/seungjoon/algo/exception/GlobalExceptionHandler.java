@@ -9,6 +9,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Iterator;
@@ -76,5 +77,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExistingAuthTypeException.class)
     public ResponseEntity<ExceptionResponse> handleExistingAuthTypeException(ExistingAuthTypeException e) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(e.getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ExceptionResponse> handleMissingServletRequestPartException(MissingServletRequestPartException e) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(BAD_REQUEST.getCode(), e.getMessage()));
     }
 }
