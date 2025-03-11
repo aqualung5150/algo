@@ -1,5 +1,6 @@
 package com.seungjoon.algo.image.service;
 
+import com.seungjoon.algo.image.dto.DeleteRequest;
 import com.seungjoon.algo.image.dto.ImagesResponse;
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Template;
@@ -77,5 +78,18 @@ public class S3Service implements ImageService {
             return fileName.substring(idx + 1);
         }
         return "";
+    }
+
+    @Override
+    public void delete(DeleteRequest request) {
+
+        for (String filename : request.getFilenames()) {
+            deleteFile(filename);
+        }
+    }
+
+    private void deleteFile(String filename) {
+
+        s3Template.deleteObject(bucket, "images/" + filename);
     }
 }

@@ -1,5 +1,6 @@
 package com.seungjoon.algo.image.service;
 
+import com.seungjoon.algo.image.dto.DeleteRequest;
 import com.seungjoon.algo.image.dto.ImagesResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,11 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public ImagesResponse upload(List<MultipartFile> multipartFiles) throws IOException {
         return new ImagesResponse(storeFiles(multipartFiles));
+    }
+
+    @Override
+    public void delete(DeleteRequest request) {
+        //delete
     }
 
     private List<String> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
