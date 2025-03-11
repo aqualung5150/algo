@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-//TODO: S3 업로드
 @Controller
 @RequestMapping("/images")
 @RequiredArgsConstructor
@@ -31,8 +30,4 @@ public class ImageController {
         ImagesResponse imagesResponse = imageService.upload(multipartFiles);
         return ResponseEntity.ok(imagesResponse);
     }
-
-
-
-
 }
