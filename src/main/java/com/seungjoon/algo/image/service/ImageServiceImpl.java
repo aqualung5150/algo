@@ -3,6 +3,7 @@ package com.seungjoon.algo.image.service;
 import com.seungjoon.algo.image.dto.DeleteRequest;
 import com.seungjoon.algo.image.dto.ImagesResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
