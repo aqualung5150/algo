@@ -30,7 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-//	local에서 실행 시 -Dcom.amazonaws.sdk.disableEc2Metadata=true 옵션을 주어야 함
+//	local에서 실행 시 spring.cloud.aws.s3.region.static=리전 설정을 주어야 함
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.3.0'
 
 	compileOnly 'org.projectlombok:lombok'
