@@ -83,7 +83,7 @@ public class S3Service implements ImageService {
     @Override
     public void delete(DeleteRequest request) {
 
-        for (String filename : request.getFilenames()) {
+        for (String filename : request.getImages()) {
             deleteFile(filename);
         }
     }

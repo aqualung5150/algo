@@ -9,5 +9,5 @@ import java.util.List;
 public class DeleteRequest {
 
     @NotNull
-    List<String> filenames;
+    List<String> images;
 }
