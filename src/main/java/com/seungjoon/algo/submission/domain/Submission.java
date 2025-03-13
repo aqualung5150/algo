@@ -26,6 +26,7 @@ public class Submission extends BaseEntity {
     private Long id;
 
     private int subjectNumber;
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
