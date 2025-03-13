@@ -1,5 +1,6 @@
 package com.seungjoon.algo.auth.service;
 
+import com.seungjoon.algo.auth.dto.EmailValidationRequest;
 import com.seungjoon.algo.auth.dto.SignUpRequest;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
 import com.seungjoon.algo.exception.BadRequestException;
@@ -8,6 +9,7 @@ import com.seungjoon.algo.exception.ExistingAuthTypeException;
 import com.seungjoon.algo.member.domain.Role;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -72,5 +74,13 @@ public class AuthService {
         member.changeRole(Role.MEMBER);
 
         return member;
+    }
+
+    public void validateEmail(EmailValidationRequest request) {
+
+        boolean exist = memberRepository.existsByEmail(request.getEmail());
+        if (exist) {
+            throw new BadRequestException(EMAIL_ALREADY_EXIST);
+        }
     }
 }

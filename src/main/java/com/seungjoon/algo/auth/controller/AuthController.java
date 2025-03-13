@@ -1,6 +1,7 @@
 package com.seungjoon.algo.auth.controller;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
+import com.seungjoon.algo.auth.dto.EmailValidationRequest;
 import com.seungjoon.algo.auth.dto.SignUpRequest;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
@@ -36,7 +37,6 @@ public class AuthController {
            HttpServletRequest request,
            HttpServletResponse response
     ) {
-
         Member member = authService.setUsername(principal.getId(), setUsernameRequest);
 
         //토큰 발급
@@ -71,9 +71,16 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public Map<String, String> signup(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public Map<String, String> signup(@Valid @RequestBody SignUpRequest request) {
 
-        authService.signUp(signUpRequest);
+        authService.signUp(request);
         return Map.of("message", "new user created");
+    }
+
+    @PostMapping("/signup/available")
+    public ResponseEntity<Void> validateEmail(@Valid @RequestBody EmailValidationRequest request) {
+
+        authService.validateEmail(request);
+        return ResponseEntity.noContent().build();
     }
 }
