@@ -30,6 +30,8 @@ public class RequestMatcherManager {
 
             //
             req(HEAD, "/recruit-posts/*/applicants/*", null),
+            req(GET, "members/*", null),
+            req(GET, "members/me", MEMBER),
             req(GET, "/members/*/studies", MEMBER),
             req(GET, "/members/*/recruit-posts", null),
             req(DELETE, "/**", MEMBER),
@@ -38,10 +40,11 @@ public class RequestMatcherManager {
             //auth
             req(PATCH, "/auth/set-username", USERNAME_UNSET),
             req(POST, "/auth/reissue", null),
-            req(POST, "/auth/signup", null),
-            req(POST, "/auth/login", null),
+            req(POST, "/auth/signup/**", null),
+//            req(POST, "/auth/login", null),
             req(POST, "/login", null),
 
+            req(GET, "/recruit-posts/**", null),
             req(POST, "/recruit-posts/**", MEMBER),
             req(PUT, "/recruit-posts/**", MEMBER),
 
