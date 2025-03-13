@@ -120,9 +120,9 @@ public class RecruitPostService {
         );
     }
 
-    public RecruitPost getRecruitPostById(Long id) {
-        return recruitPostRepository.findByIdJoinFetch(id)
-                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+    public RecruitPostResponse getRecruitPostById(Long id) {
+        return RecruitPostResponse.from(recruitPostRepository.findByIdJoinFetch(id)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST)));
     }
 
     public ApplicantProfileSliceResponse getApplications(Long postId, Pageable pageable) {

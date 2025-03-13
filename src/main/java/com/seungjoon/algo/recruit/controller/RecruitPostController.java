@@ -37,8 +37,7 @@ public class RecruitPostController {
     @GetMapping("{id}")
     public ResponseEntity<RecruitPostResponse> getRecruitPost(@PathVariable Long id) {
 
-        RecruitPost post = recruitPostService.getRecruitPostById(id);
-        return ResponseEntity.ok().body(RecruitPostResponse.from(post));
+        return ResponseEntity.ok().body(recruitPostService.getRecruitPostById(id));
     }
 
     @PostMapping
