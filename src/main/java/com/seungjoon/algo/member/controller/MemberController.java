@@ -35,8 +35,14 @@ public class MemberController {
     private final RecruitPostService recruitPostService;
 
     @GetMapping("{id}")
-    public ResponseEntity<ProfileResponse> getUser(@PathVariable Long id) {
+    public ResponseEntity<ProfileResponse> getMember(@PathVariable Long id) {
         Member member = memberService.getById(id);
+        return ResponseEntity.ok(ProfileResponse.from(member));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ProfileResponse> getMyProfile(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        Member member = memberService.getById(principalDetails.getId());
         return ResponseEntity.ok(ProfileResponse.from(member));
     }
 
