@@ -22,8 +22,6 @@ import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
 @RequiredArgsConstructor
 public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${spring.frontend.base-url}")
-    private String defaultRedirectUrl;
     private static final String REDIRECT_URL = "redirectUrl";
 
     private final JwtProvider jwtProvider;
@@ -53,7 +51,7 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 
         String redirectUrl = request.getSession().getAttribute(REDIRECT_URL).toString();
         if (!StringUtils.hasText(redirectUrl)) {
-            redirectUrl = defaultRedirectUrl;
+            redirectUrl = "";
         }
 
         Map<String, ? extends Serializable> body = Map.of("message", "success", "redirectUrl", redirectUrl);

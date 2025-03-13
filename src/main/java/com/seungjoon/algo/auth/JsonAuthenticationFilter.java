@@ -22,8 +22,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class JsonAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    @Value("${spring.frontend.base-url}")
-    private String defaultRedirectUrl;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JsonAuthenticationFilter(String defaultFilterProcessesUrl) {
@@ -53,7 +51,7 @@ public class JsonAuthenticationFilter extends AbstractAuthenticationProcessingFi
 
     private void storeSessionRedirectUrl(HttpServletRequest request) {
         Cookie redirectCookie = CookieUtil.getCookieFromRequest(request, "redirectUrl").orElse(null);
-        String redirectUrl = redirectCookie == null ? defaultRedirectUrl : redirectCookie.getValue();
+        String redirectUrl = redirectCookie == null ? "" : redirectCookie.getValue();
         request.getSession().setAttribute("redirectUrl", redirectUrl);
     }
 }

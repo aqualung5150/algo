@@ -20,8 +20,6 @@ import static com.seungjoon.algo.auth.jwt.JwtType.REFRESH;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${spring.frontend.base-url}")
-    private String defaultRedirectUrl;
     private static final String REDIRECT_URL = "redirectUrl";
 
     private final JwtProvider jwtProvider;
@@ -50,7 +48,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String redirectUrl = request.getSession().getAttribute(REDIRECT_URL).toString();
         if (!StringUtils.hasText(redirectUrl)) {
-            redirectUrl = defaultRedirectUrl;
+            redirectUrl = "";
         }
 
         if (role.equals("USERNAME_UNSET")) {

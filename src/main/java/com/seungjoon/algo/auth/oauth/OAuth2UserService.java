@@ -1,19 +1,17 @@
 package com.seungjoon.algo.auth.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.ExistingAuthTypeException;
-import com.seungjoon.algo.member.domain.Role;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.domain.MemberState;
+import com.seungjoon.algo.member.domain.Role;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.utils.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -32,10 +30,6 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
     private final HttpServletRequest request;
-    @Value("${spring.frontend.base-url}")
-    private String defaultRedirectUrl;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -110,7 +104,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private void storeSessionRedirectUrl() {
         Cookie redirectCookie = CookieUtil.getCookieFromRequest(request, "redirectUrl").orElse(null);
-        String redirectUrl = redirectCookie == null ? defaultRedirectUrl : redirectCookie.getValue();
+        String redirectUrl = redirectCookie == null ? "" : redirectCookie.getValue();
         request.getSession().setAttribute("redirectUrl", redirectUrl);
     }
 }
