@@ -24,6 +24,13 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 
     private static final String REDIRECT_URL = "redirectUrl";
 
+    @Value("${frontend.base-url}")
+    private String frontendBaseUrl;
+    @Value("${jwt.access-expire}")
+    private Long accessExpire;
+    @Value("${jwt.refresh-expire}")
+    private Long refreshExpire;
+
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -32,6 +39,7 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 
         // redirectUrl 쿠키 삭제
         Cookie cookie = new Cookie(REDIRECT_URL, null);
+        //TODO: setDomain?
         cookie.setDomain("localhost");
         cookie.setPath("/");
         cookie.setMaxAge(0);
@@ -43,8 +51,8 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
                 .iterator().next()
                 .getAuthority();
 
-        String accessToken = jwtProvider.generateToken(ACCESS, userDetails.getId(), role, 10 * 60 * 1000L);
-        String refreshToken = jwtProvider.generateToken(REFRESH, userDetails.getId(), role, 10 * 60 * 1000L);
+        String accessToken = jwtProvider.generateToken(ACCESS, userDetails.getId(), role, accessExpire);
+        String refreshToken = jwtProvider.generateToken(REFRESH, userDetails.getId(), role, refreshExpire);
 
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
         response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));

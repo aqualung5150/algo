@@ -71,8 +71,10 @@ public class JwtProvider {
                 .compact();
     }
 
+    //TODO: setSecure
     public Cookie createJwtCookie(String key, String token) {
         Cookie cookie = new Cookie(key, token);
+//        cookie.setDomain("localhost");
         cookie.setPath("/");
         cookie.setHttpOnly(true);
 //        cookie.setMaxAge(10 * 60);

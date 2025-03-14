@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
+import static com.seungjoon.algo.exception.ExceptionCode.*;
 
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -39,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
             Optional<Cookie> accessTokenCookie = CookieUtil.getCookieFromRequest(request, "access_token");
 
             if (accessTokenCookie.isEmpty()) {
-                throw new MissingJwtTokenException(ExceptionCode.MISSING_JWT_TOKEN);
+                throw new MissingJwtTokenException(MISSING_JWT_TOKEN);
             }
 
             String accessToken = accessTokenCookie.get().getValue();
