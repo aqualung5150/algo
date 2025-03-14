@@ -2,6 +2,7 @@ package com.seungjoon.algo.auth.oauth;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
+import com.seungjoon.algo.member.domain.Role;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private static final String REDIRECT_URL = "redirectUrl";
 
+    @Value("${frontend.base-url}")
+    private String frontendBaseUrl;
+    @Value("${jwt.access-expire}")
+    private Long accessExpire;
+    @Value("${jwt.refresh-expire}")
+    private Long refreshExpire;
+
+
     private final JwtProvider jwtProvider;
 
     @Override
@@ -29,6 +38,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // redirectUrl 쿠키 삭제
         Cookie cookie = new Cookie(REDIRECT_URL, null);
+        //TODO: setDomain?
         cookie.setDomain("localhost");
         cookie.setPath("/");
         cookie.setMaxAge(0);
@@ -40,8 +50,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .iterator().next()
                 .getAuthority();
 
-        String accessToken = jwtProvider.generateToken(ACCESS, userDetails.getId(), role, 10 * 60 * 1000L);
-        String refreshToken = jwtProvider.generateToken(REFRESH, userDetails.getId(), role, 10 * 60 * 1000L);
+        String accessToken = jwtProvider.generateToken(ACCESS, userDetails.getId(), role, accessExpire);
+        String refreshToken = jwtProvider.generateToken(REFRESH, userDetails.getId(), role, refreshExpire);
 
         response.addCookie(jwtProvider.createJwtCookie("access_token", accessToken));
         response.addCookie(jwtProvider.createJwtCookie("refresh_token", refreshToken));
@@ -51,10 +61,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             redirectUrl = "";
         }
 
-        if (role.equals("USERNAME_UNSET")) {
-            response.sendRedirect("http://localhost:5173/set-username");
+        if (role.equals(Role.USERNAME_UNSET.name())) {
+            response.sendRedirect(frontendBaseUrl + "set-username");
         } else {
-            response.sendRedirect(redirectUrl);
+            response.sendRedirect(frontendBaseUrl + redirectUrl);
             request.getSession().removeAttribute(REDIRECT_URL);
         }
     }
