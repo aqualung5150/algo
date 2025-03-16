@@ -1,6 +1,5 @@
 package com.seungjoon.algo.recruit.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -22,18 +21,19 @@ public class CreateRecruitPostRequest {
     @NotNull
     @Range(min = 2, max = 4)
     private Integer numberOfMembers;
+
     @NotNull
-    @Range(min = 1, max = 30)
-    private Integer minLevel;
-    @NotNull
-    @Range(min = 1, max = 30)
-    private Integer maxLevel;
+    @Range(min = 1, max = 5)
+    private Integer level;
+
     @NotNull
     private Integer totalWeek;
+
     @NotBlank
     @Pattern(regexp = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)$",
             message = "MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY 중 하나를 입력하세요.")
     private String submitDayOfWeek;
+
     @NotNull
     private Integer submitPerWeek;
 

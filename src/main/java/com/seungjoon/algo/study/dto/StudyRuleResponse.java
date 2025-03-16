@@ -13,23 +13,21 @@ import java.util.List;
 public class StudyRuleResponse {
 
     private int numberOfMembers;
-    private int minLevel;
-    private int maxLevel;
+    private int level;
     private int totalWeek;
     private String submitDayOfWeek;
     private int submitPerWeek;
-    private List<String> tags;
+    private List<Long> tags;
 
     public static StudyRuleResponse from(StudyRule studyRule) {
         return new StudyRuleResponse(
                 studyRule.getNumberOfMembers(),
-                studyRule.getMinLevel(),
-                studyRule.getMaxLevel(),
+                studyRule.getLevel(),
                 studyRule.getTotalWeek(),
                 studyRule.getSubmitDayOfWeek().name(),
                 studyRule.getSubmitPerWeek(),
                 studyRule.getStudyRuleTags().stream()
-                        .map(studyRuleTag -> studyRuleTag.getTag().getName())
+                        .map(studyRuleTag -> studyRuleTag.getTag().getId())
                         .toList()
         );
     }

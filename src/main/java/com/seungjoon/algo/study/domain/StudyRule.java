@@ -24,8 +24,7 @@ public class StudyRule extends BaseEntity {
     private Long id;
 
     private int numberOfMembers;
-    private int minLevel;
-    private int maxLevel;
+    private int level;
     private int totalWeek;
     @Enumerated(EnumType.STRING)
     private DayOfWeek submitDayOfWeek;
@@ -42,10 +41,9 @@ public class StudyRule extends BaseEntity {
     private List<StudyRuleTag> studyRuleTags = new ArrayList<>();
 
     @Builder
-    private StudyRule(int numberOfMembers, int minLevel, int maxLevel, int totalWeek, DayOfWeek submitDayOfWeek, int submitPerWeek) {
+    private StudyRule(int numberOfMembers, int level, int totalWeek, DayOfWeek submitDayOfWeek, int submitPerWeek) {
         this.numberOfMembers = numberOfMembers;
-        this.minLevel = minLevel;
-        this.maxLevel = maxLevel;
+        this.level = level;
         this.totalWeek = totalWeek;
         this.submitDayOfWeek = submitDayOfWeek;
         this.submitPerWeek = submitPerWeek;
@@ -57,15 +55,13 @@ public class StudyRule extends BaseEntity {
 
     public void changeStudyRule(
             int numberOfMembers,
-            int minLevel,
-            int maxLevel,
+            int level,
             int totalWeek,
             DayOfWeek submitDayOfWeek,
             int submitPerWeek
     ) {
         this.numberOfMembers = numberOfMembers;
-        this.minLevel = minLevel;
-        this.maxLevel = maxLevel;
+        this.level = level;
         this.totalWeek = totalWeek;
         this.submitDayOfWeek = submitDayOfWeek;
         this.submitPerWeek = submitPerWeek;

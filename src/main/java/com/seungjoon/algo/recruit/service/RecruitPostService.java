@@ -14,7 +14,6 @@ import com.seungjoon.algo.recruit.repository.RecruitPostRepository;
 import com.seungjoon.algo.study.domain.StudyRule;
 import com.seungjoon.algo.study.domain.StudyRuleTag;
 import com.seungjoon.algo.study.repository.StudyRuleRepository;
-import com.seungjoon.algo.study.repository.StudyRuleTagRepository;
 import com.seungjoon.algo.submission.domain.Tag;
 import com.seungjoon.algo.submission.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +27,7 @@ import java.time.DayOfWeek;
 import java.util.List;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
-import static com.seungjoon.algo.exception.ExceptionCode.NOT_FOUND_MEMBER;
-import static com.seungjoon.algo.exception.ExceptionCode.NOT_FOUND_POST;
-import static com.seungjoon.algo.recruit.domain.RecruitPostState.*;
+import static com.seungjoon.algo.recruit.domain.RecruitPostState.RECRUITING;
 
 @Service
 @Transactional(readOnly = true)
@@ -54,8 +51,7 @@ public class RecruitPostService {
 
         StudyRule studyRule = studyRuleRepository.save(StudyRule.builder()
                         .numberOfMembers(request.getNumberOfMembers())
-                        .minLevel(request.getMinLevel())
-                        .maxLevel(request.getMaxLevel())
+                        .level(request.getLevel())
                         .submitDayOfWeek(DayOfWeek.valueOf(request.getSubmitDayOfWeek()))
                         .totalWeek(request.getTotalWeek())
                         .submitPerWeek(request.getSubmitPerWeek())
@@ -182,8 +178,7 @@ public class RecruitPostService {
         StudyRule studyRule = post.getStudyRule();
         studyRule.changeStudyRule(
                 request.getNumberOfMembers(),
-                request.getMinLevel(),
-                request.getMaxLevel(),
+                request.getLevel(),
                 request.getTotalWeek(),
                 DayOfWeek.valueOf(request.getSubmitDayOfWeek()),
                 request.getSubmitPerWeek()

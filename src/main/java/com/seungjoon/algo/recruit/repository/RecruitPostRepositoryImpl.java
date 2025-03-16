@@ -4,6 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seungjoon.algo.recruit.domain.RecruitPost;
+import com.seungjoon.algo.recruit.domain.RecruitPostState;
 import com.seungjoon.algo.recruit.dto.RecruitPostCondition;
 import com.seungjoon.algo.utils.QuerydslUtils;
 import jakarta.persistence.EntityManager;
@@ -46,8 +47,8 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
                 .join(recruitPost.member).fetchJoin()
                 .where(
                         studyRuleInByTag(condition.getTag()),
-                        minLevelGoe(condition.getMinLevel()),
-                        maxLevelLoe(condition.getMaxLevel()),
+                        state(condition.getState()),
+                        level(condition.getLevel()),
                         titleContains(condition.getTitle())
                 )
                 .orderBy(QuerydslUtils.getSort(pageable, recruitPost))
@@ -62,8 +63,8 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
         joinStudyRuleByCondition(countQuery, condition)
                 .where(
                         studyRuleInByTag(condition.getTag()),
-                        minLevelGoe(condition.getMinLevel()),
-                        maxLevelLoe(condition.getMaxLevel()),
+                        state(condition.getState()),
+                        level(condition.getLevel()),
                         titleContains(condition.getTitle())
                 );
 
@@ -86,12 +87,12 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
         return studyRule.id.in(studyRuleIdsByTagQuery);
     }
 
-    private BooleanExpression minLevelGoe(Integer level) {
-        return level != null ? studyRule.minLevel.goe(level) : null;
+    private BooleanExpression level(Integer level) {
+        return level != null ? studyRule.level.eq(level) : null;
     }
 
-    private BooleanExpression maxLevelLoe(Integer level) {
-        return level != null ? studyRule.maxLevel.loe(level) : null;
+    private BooleanExpression state(String state) {
+        return StringUtils.hasText(state) ? recruitPost.state.eq(RecruitPostState.valueOf(state)) : null;
     }
 
     private BooleanExpression titleContains(String title) {
@@ -103,8 +104,8 @@ public class RecruitPostRepositoryImpl implements RecruitPostRepositoryCustom{
             RecruitPostCondition condition
     ) {
         if (
-                condition.getMaxLevel() != null ||
-                condition.getMinLevel() != null ||
+                condition.getLevel() != null ||
+                StringUtils.hasText(condition.getState()) ||
                 !ObjectUtils.isEmpty(condition.getTag())
         ) {
             countQuery = countQuery.join(recruitPost.studyRule);

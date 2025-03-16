@@ -9,6 +9,6 @@ public class RecruitPostCondition {
 
     private String title;
     private List<Long> tag;
-    private Integer minLevel;
-    private Integer maxLevel;
+    private Integer level;
+    private String state;
 }
