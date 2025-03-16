@@ -5,6 +5,7 @@ import com.seungjoon.algo.auth.dto.EmailValidationRequest;
 import com.seungjoon.algo.auth.dto.SignUpRequest;
 import com.seungjoon.algo.auth.jwt.JwtProvider;
 import com.seungjoon.algo.auth.oauth.dto.SetUsernameRequest;
+import com.seungjoon.algo.auth.oauth.dto.SetUsernameResponse;
 import com.seungjoon.algo.auth.service.AuthService;
 import com.seungjoon.algo.member.domain.Member;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ public class AuthController {
     private final JwtProvider jwtProvider;
 
     @PatchMapping("/set-username")
-    public Map<String, String> setUsername(
+    public ResponseEntity<SetUsernameResponse> setUsername(
             @AuthenticationPrincipal PrincipalDetails principal,
             @Valid @RequestBody SetUsernameRequest setUsernameRequest,
            HttpServletRequest request,
@@ -55,7 +56,7 @@ public class AuthController {
         String redirectUrl = request.getSession().getAttribute(REDIRECT_URL).toString();
         request.getSession().removeAttribute(REDIRECT_URL);
 
-        return Map.of("message", "success", "redirectUrl", redirectUrl);
+        return ResponseEntity.ok(SetUsernameResponse.of(redirectUrl, member));
     }
 
     @PostMapping("/reissue")
