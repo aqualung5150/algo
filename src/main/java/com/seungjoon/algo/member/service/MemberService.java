@@ -2,6 +2,7 @@ package com.seungjoon.algo.member.service;
 
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.member.domain.Member;
+import com.seungjoon.algo.member.dto.UpdateUsernameRequest;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.recruit.repository.ApplicantRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,14 @@ public class MemberService {
         return memberRepository
                 .findById(id)
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
+    }
+
+    @Transactional
+    public Member updateById(Long id, UpdateUsernameRequest request) {
+        Member member = getById(id);
+
+        member.changeUsername(request.getUsername());
+
+        return member;
     }
 }

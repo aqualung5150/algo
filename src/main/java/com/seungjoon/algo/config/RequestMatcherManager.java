@@ -34,6 +34,7 @@ public class RequestMatcherManager {
             req(GET, "/members/me", MEMBER),
             req(GET, "/members/*/studies", MEMBER),
             req(GET, "/members/*/recruit-posts", null),
+            req(PATCH, "members/*", MEMBER),
             req(DELETE, "/**", MEMBER),
 //            req(GET, "/users/*", MEMBER),
 
