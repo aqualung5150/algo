@@ -22,6 +22,9 @@ public class S3Service implements ImageService {
     private String bucket;
     private final S3Template s3Template;
 
+    @Value("${cloudfront.base-url}")
+    private String baseUrl;
+
     @Override
     public ImagesResponse upload(List<MultipartFile> multipartFiles) throws IOException {
         return new ImagesResponse(storeFiles(multipartFiles));
@@ -29,7 +32,7 @@ public class S3Service implements ImageService {
 
     private List<String> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
 
-        List<String> storedFilenames = new ArrayList<>();
+        List<String> paths = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
 
@@ -37,12 +40,12 @@ public class S3Service implements ImageService {
                 continue;
             }
 
-            String storeFilename = storeFile(multipartFile);
+            String path = storeFile(multipartFile);
 
-            storedFilenames.add(storeFilename);
+            paths.add(path);
         }
 
-        return storedFilenames;
+        return paths;
     }
 
     private String storeFile(MultipartFile multipartFile) throws IOException {
@@ -60,7 +63,7 @@ public class S3Service implements ImageService {
                 ObjectMetadata.builder().contentType(multipartFile.getContentType()).build()
         );
 
-        return storeFilename;
+        return baseUrl + "images/" + storeFilename;
     }
 
     private String createStoreFilename(MultipartFile multipartFile) {

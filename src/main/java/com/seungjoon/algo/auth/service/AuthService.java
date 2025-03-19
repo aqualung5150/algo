@@ -27,6 +27,9 @@ import static com.seungjoon.algo.member.domain.MemberState.ACTIVE;
 @Transactional
 public class AuthService {
 
+    @Value("${cloudfront.base-url}")
+    private String baseUrl;
+
     @Value("${jwt.access-expire}")
     private Long accessExpire;
 
@@ -54,9 +57,10 @@ public class AuthService {
         return memberRepository.save(Member.builder()
                 .email(signUpRequest.getEmail())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .authType("normal")
-                .role(MEMBER)
                 .username(signUpRequest.getUsername())
+                .role(MEMBER)
+                .imageUrl(baseUrl + "images/default.jpg")
+                .authType("normal")
                 .state(ACTIVE)
                 .build());
     }

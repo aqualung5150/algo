@@ -49,10 +49,6 @@ public class Member extends BaseEntity {
         this.authType = authType;
         this.role = role;
         this.state = state;
-
-        if (imageUrl == null) {
-            this.imageUrl = "default.jpg";
-        }
     }
 
     public void changeImageUrl(String imageUrl) {
