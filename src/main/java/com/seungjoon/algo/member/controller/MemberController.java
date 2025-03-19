@@ -3,7 +3,7 @@ package com.seungjoon.algo.member.controller;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.dto.ProfileResponse;
-import com.seungjoon.algo.member.dto.UpdateUsernameRequest;
+import com.seungjoon.algo.member.dto.UpdateMemberRequest;
 import com.seungjoon.algo.member.service.MemberService;
 import com.seungjoon.algo.recruit.dto.RecruitPostSliceResponse;
 import com.seungjoon.algo.recruit.service.RecruitPostService;
@@ -48,7 +48,7 @@ public class MemberController {
     @PutMapping("/me")
     public ResponseEntity<ProfileResponse> updateMyProfile(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @Valid @RequestBody UpdateUsernameRequest request
+            @Valid @RequestBody UpdateMemberRequest request
     ) {
         Member member = memberService.updateById(principalDetails.getId(), request);
         return ResponseEntity.ok(ProfileResponse.from(member));

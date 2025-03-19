@@ -56,4 +56,9 @@ public class Member extends BaseEntity {
     }
     public void changeUsername(String username) { this.username = username; }
     public void changeRole(Role role) { this.role = role; }
+
+    public void updateMember(String username, String imageUrl) {
+        this.username = username;
+        this.imageUrl = imageUrl;
+    }
 }
