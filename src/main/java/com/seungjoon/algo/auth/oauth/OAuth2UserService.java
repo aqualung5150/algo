@@ -72,7 +72,6 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 throw new ExistingAuthTypeException(exceptionCode);
             }
 
-            exist.changeImageUrl(oAuth2UserInfo.getImageUrl());
             return exist;
         }
 
