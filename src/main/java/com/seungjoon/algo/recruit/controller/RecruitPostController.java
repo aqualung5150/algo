@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Map;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -41,13 +42,13 @@ public class RecruitPostController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createRecruitPost(
+    public ResponseEntity<Map<String, Long>> createRecruitPost(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateRecruitPostRequest request
     ) {
 
         Long id = recruitPostService.createRecruitPost(principalDetails.getId(), request);
-        return ResponseEntity.created(URI.create("/recruit-posts/" + id)).build();
+        return ResponseEntity.ok(Map.of("id", id));
     }
 
     @PutMapping("{id}")

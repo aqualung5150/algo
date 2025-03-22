@@ -1,7 +1,9 @@
 package com.seungjoon.algo.study.controller;
 
 import com.seungjoon.algo.auth.PrincipalDetails;
-import com.seungjoon.algo.study.dto.*;
+import com.seungjoon.algo.study.dto.ClosingVoteResponse;
+import com.seungjoon.algo.study.dto.CreateStudyRequest;
+import com.seungjoon.algo.study.dto.StudyResponse;
 import com.seungjoon.algo.study.service.StudyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/study")
@@ -19,13 +21,13 @@ public class StudyController {
     private final StudyService studyService;
 
     @PostMapping
-    public ResponseEntity<Void> create(
+    public ResponseEntity<Map<String, Long>> create(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateStudyRequest request
     ) {
         Long id = studyService.createStudy(principalDetails.getId(), request);
 
-        return ResponseEntity.created(URI.create("/study/" + id)).build();
+        return ResponseEntity.ok(Map.of("id", id));
     }
 
     @GetMapping("{id}")
