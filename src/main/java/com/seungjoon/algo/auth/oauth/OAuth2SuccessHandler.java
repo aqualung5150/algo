@@ -62,7 +62,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         if (role.equals(Role.USERNAME_UNSET.name())) {
-            response.sendRedirect(frontendBaseUrl + "set-username");
+            response.sendRedirect(frontendBaseUrl + "/set-username");
         } else {
             response.sendRedirect(frontendBaseUrl + redirectUrl);
             request.getSession().removeAttribute(REDIRECT_URL);
