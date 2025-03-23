@@ -37,7 +37,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
 
-    @PatchMapping("/set-username")
+    @PatchMapping("set-username")
     public ResponseEntity<SetUsernameResponse> setUsername(
             @AuthenticationPrincipal PrincipalDetails principal,
             @Valid @RequestBody SetUsernameRequest setUsernameRequest,
@@ -59,7 +59,7 @@ public class AuthController {
         return ResponseEntity.ok(SetUsernameResponse.of(redirectUrl, member));
     }
 
-    @PostMapping("/reissue")
+    @PostMapping("reissue")
     public ResponseEntity<Void> reissue(
             @CookieValue(value = "refresh_token", required = false) String refreshToken,
             HttpServletResponse response
@@ -72,14 +72,14 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/signup")
+    @PostMapping("signup")
     public Map<String, String> signup(@Valid @RequestBody SignUpRequest request) {
 
         authService.signUp(request);
         return Map.of("message", "new user created");
     }
 
-    @PostMapping("/signup/available")
+    @PostMapping("signup/available")
     public ResponseEntity<Void> validateEmail(@Valid @RequestBody EmailValidationRequest request) {
 
         authService.validateEmail(request);

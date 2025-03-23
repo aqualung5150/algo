@@ -9,6 +9,7 @@ import java.util.List;
 public class StudyResponse {
 
     private final Long id;
+    private final String name;
     private final StudyRuleResponse studyRule;
     private final List<StudyMemberResponse> members;
 
@@ -20,6 +21,7 @@ public class StudyResponse {
 
         return new StudyResponse(
                 study.getId(),
+                study.getName(),
                 StudyRuleResponse.from(study.getStudyRule()),
                 members
         );

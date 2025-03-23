@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/study")
+@RequestMapping("study")
 @RequiredArgsConstructor
 public class StudyController {
 
