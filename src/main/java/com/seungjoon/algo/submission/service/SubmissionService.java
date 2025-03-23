@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,8 +67,13 @@ public class SubmissionService {
 
     public SubmissionPageResponse getSubmissions(SubmissionCondition condition, Pageable pageable) {
 
-        Page<Submission> page = submissionRepository.findAllByCondition(condition, pageable);
+        Page<Submission> page = submissionRepository.findPageByCondition(condition, pageable);
         return SubmissionPageResponse.of(page.getTotalElements(), page.getContent());
+    }
+
+    public SubmissionSliceResponse getSubmissionsSlice(SubmissionCondition condition, Pageable pageable) {
+        Slice<Submission> slice = submissionRepository.findSliceByCondition(condition, pageable);
+        return SubmissionSliceResponse.of(slice.hasNext(), slice.getContent());
     }
 
     @Transactional
@@ -212,4 +218,6 @@ public class SubmissionService {
 
         return EvaluationsResponse.from(evaluations);
     }
+
+
 }

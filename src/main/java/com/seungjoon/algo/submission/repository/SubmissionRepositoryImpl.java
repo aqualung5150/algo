@@ -9,6 +9,8 @@ import com.seungjoon.algo.utils.QuerydslUtils;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +28,7 @@ public class SubmissionRepositoryImpl implements SubmissionRepositoryCustom{
     }
 
     @Override
-    public Page<Submission> findAllByCondition(SubmissionCondition condition, Pageable pageable) {
+    public Page<Submission> findPageByCondition(SubmissionCondition condition, Pageable pageable) {
 
         List<Submission> submissions = queryFactory
                 .selectFrom(submission)
@@ -54,6 +56,32 @@ public class SubmissionRepositoryImpl implements SubmissionRepositoryCustom{
 
         return PageableExecutionUtils.getPage(submissions, pageable, countQuery::fetchOne);
     }
+
+    @Override
+    public Slice<Submission> findSliceByCondition(SubmissionCondition condition, Pageable pageable) {
+        List<Submission> submissions = queryFactory
+                .selectFrom(submission)
+                .join(submission.member).fetchJoin()
+                .where(
+                        subjectNumber(condition.getSubjectNumber()),
+                        memberId(condition.getMemberId()),
+                        studyId(condition.getStudyId()),
+                        weekNumber(condition.getWeekNumber())
+                )
+                .orderBy(QuerydslUtils.getSort(pageable, submission))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = false;
+        if (submissions.size() > pageable.getPageSize()) {
+            hasNext = true;
+            submissions.remove(submissions.size() - 1);
+        }
+
+        return new SliceImpl<>(submissions, pageable, hasNext);
+    }
+
 
     private BooleanExpression subjectNumber(Integer subjectNumber) {
         return subjectNumber != null ? submission.subjectNumber.eq(subjectNumber) : null;

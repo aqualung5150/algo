@@ -38,6 +38,14 @@ public class SubmissionController {
         return ResponseEntity.ok(submissionService.getSubmissions(condition, pageable));
     }
 
+    @GetMapping("slice")
+    public ResponseEntity<SubmissionSliceResponse> getSubmissionsSlice(
+            @ModelAttribute SubmissionCondition condition,
+            @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(submissionService.getSubmissionsSlice(condition, pageable));
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<SubmissionResponse> getSubmission(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
