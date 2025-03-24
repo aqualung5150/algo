@@ -12,12 +12,13 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SubmissionResponse {
 
-    private Long submissionId;
+    private Long id;
     private Integer subjectNumber;
     private ProfileResponse profile;
     private String content;
     private String visibility;
     private Integer weekNumber;
+    private String state;
     private List<Long> tags;
 
     public static SubmissionResponse from(Submission submission) {
@@ -29,6 +30,7 @@ public class SubmissionResponse {
                 submission.getContent(),
                 submission.getVisibility().name(),
                 submission.getWeekNumber(),
+                submission.getState().name(),
                 submission.getTags().stream().mapToLong(st -> st.getTag().getId()).boxed().toList()
         );
     }

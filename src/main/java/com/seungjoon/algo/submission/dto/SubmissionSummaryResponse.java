@@ -10,11 +10,12 @@ import lombok.Data;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SubmissionSummaryResponse {
 
-    private Long submissionId;
+    private Long id;
     private Integer subjectNumber;
     private ProfileResponse profile;
     private String visibility;
     private Integer weekNumber;
+    private String state;
 
     public static SubmissionSummaryResponse from(Submission submission) {
         return new SubmissionSummaryResponse(
@@ -22,7 +23,8 @@ public class SubmissionSummaryResponse {
                 submission.getSubjectNumber(),
                 ProfileResponse.from(submission.getMember()),
                 submission.getVisibility().name(),
-                submission.getWeekNumber()
+                submission.getWeekNumber(),
+                submission.getState().name()
         );
     }
 }
