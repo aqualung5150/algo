@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SubmissionResponse {
 
-    private Long id;
     private Integer subjectNumber;
     private ProfileResponse profile;
     private String content;
@@ -24,7 +23,6 @@ public class SubmissionResponse {
     public static SubmissionResponse from(Submission submission) {
 
         return new SubmissionResponse(
-                submission.getId(),
                 submission.getSubjectNumber(),
                 ProfileResponse.from(submission.getMember()),
                 submission.getContent(),

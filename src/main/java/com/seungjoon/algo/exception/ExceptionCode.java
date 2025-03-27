@@ -40,7 +40,8 @@ public enum ExceptionCode {
     DUPLICATE_EVALUATION(1027, "이미 평가가 존재합니다."),
     NOT_FOUND_SUBMISSION(1028, "존재하지 않는 제출입니다."),
     SELF_EVALUATE(1029, "자신의 제출을 평가할 수 없습니다."),
-    SUBMISSION_LIMIT_EXCEEDED(1030, "이번 주 제출 가능한 횟수를 초과했습니다.");
+    SUBMISSION_LIMIT_EXCEEDED(1030, "이번 주 제출 가능한 횟수를 초과했습니다."),
+    NOT_FOUND_EVALUATION(1031, "존재하지 않는 평가입니다.");
 
 
 //    INVALID_PASSWORD(1007, "패스워드가 일치하지 않습니다.");

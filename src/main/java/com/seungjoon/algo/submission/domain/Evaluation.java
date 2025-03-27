@@ -38,4 +38,9 @@ public class Evaluation extends BaseEntity {
         this.submission = submission;
         this.member = member;
     }
+
+    public void changeEvaluation(String content, String passFail) {
+        this.content = content;
+        this.passFail = PassFail.valueOf(passFail);
+    }
 }

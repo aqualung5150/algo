@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/submissions")
@@ -22,12 +23,12 @@ public class SubmissionController {
     private final SubmissionService submissionService;
 
     @PostMapping
-    public ResponseEntity<Void> submit(
+    public ResponseEntity<Map<String, Long>> submit(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateSubmissionRequest request
     ) {
-        Long submitId = submissionService.submit(principalDetails.getId(), request);
-        return ResponseEntity.created(URI.create("/submissions/" + submitId)).build();
+        Long id = submissionService.submit(principalDetails.getId(), request);
+        return ResponseEntity.ok(Map.of("id", id));
     }
 
     @GetMapping
@@ -72,5 +73,15 @@ public class SubmissionController {
 
         Long evaluationId = submissionService.evaluate(id, principalDetails.getId(), request);
         return ResponseEntity.created(URI.create("/submissions/" + id + "/evaluations/" + evaluationId)).build();
+    }
+
+    @PutMapping("{id}/evaluations")
+    public ResponseEntity<Void> updateEvaluation(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id,
+            @Valid @RequestBody CreateEvaluationRequest request
+    ) {
+        submissionService.updateEvaluation(id, principalDetails.getId(), request);
+        return ResponseEntity.ok().build();
     }
 }

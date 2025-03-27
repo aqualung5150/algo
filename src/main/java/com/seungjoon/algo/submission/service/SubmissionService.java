@@ -115,8 +115,8 @@ public class SubmissionService {
     @Transactional
     public Long evaluate(Long submissionId, Long evaluatorId, CreateEvaluationRequest request) {
 
-        Member evaluator = memberRepository.findById(evaluatorId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
         Submission submission = submissionRepository.findByIdJoinFetchStudy(submissionId).orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
+        Member evaluator = memberRepository.findById(evaluatorId).orElseThrow(() -> new BadRequestException(NOT_FOUND_MEMBER));
         Study study = submission.getStudy();
 
         if (submission.getMember().getId().equals(evaluator.getId())) {
@@ -134,9 +134,19 @@ public class SubmissionService {
                 .passFail(PassFail.valueOf(request.getPassFail()))
                 .build());
 
-        updateStateOrNot(submission, study);
+        updateStateOrNot(submission);
 
         return saved.getId();
+    }
+
+    @Transactional
+    public void updateEvaluation(Long submissionId, Long authId, @Valid CreateEvaluationRequest request) {
+        Submission submission = submissionRepository.findByIdJoinFetchStudy(submissionId).orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
+        Evaluation evaluation = evaluationRepository.findBySubmissionIdAndMemberId(submission.getId(), authId).orElseThrow(() -> new BadRequestException(NOT_FOUND_EVALUATION));
+
+        evaluation.changeEvaluation(request.getContent(), request.getPassFail());
+
+        updateStateOrNot(submission);
     }
 
     private void validateMaxLimit(Study study, Member member, Integer weekNumber) {
@@ -148,11 +158,11 @@ public class SubmissionService {
         }
     }
 
-    private void updateStateOrNot(Submission submission, Study study) {
+    private void updateStateOrNot(Submission submission) {
 
         List<Evaluation> evaluations = evaluationRepository.findBySubmission(submission);
 
-        if (evaluations.size() < study.getNumberOfMembers() - 1) {
+        if (evaluations.size() < submission.getStudy().getNumberOfMembers() - 1) {
             return;
         }
 
@@ -218,6 +228,4 @@ public class SubmissionService {
 
         return EvaluationsResponse.from(evaluations);
     }
-
-
 }
