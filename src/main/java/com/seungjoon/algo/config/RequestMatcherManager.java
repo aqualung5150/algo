@@ -53,7 +53,7 @@ public class RequestMatcherManager {
             req(GET, "/admin/**", ADMIN),
 
             //study
-            req(GET, "/study/**", null),
+            req(GET, "/study/**", MEMBER),
             req(POST, "/study/**", MEMBER),
 
             //submission
