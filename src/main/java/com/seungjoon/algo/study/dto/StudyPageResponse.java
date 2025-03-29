@@ -22,20 +22,16 @@ public class StudyPageResponse {
                 studies.stream().map(study -> new StudyProfile(
                         study.getId(),
                                 study.getName(),
-                        study.getState())
+                        study.getState().name())
                         ).toList()
         );
     }
 
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Data
     static public class StudyProfile {
         private Long id;
         private String name;
         private String state;
-
-        public StudyProfile(Long id, String name, StudyState state) {
-            this.id = id;
-            this.name = name;
-            this.state = state.name();
-        }
     }
 }
