@@ -3,7 +3,6 @@ package com.seungjoon.algo.auth.jwt;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.auth.PrincipalDto;
 import com.seungjoon.algo.config.RequestMatcherManager;
-import com.seungjoon.algo.exception.ExceptionCode;
 import com.seungjoon.algo.exception.MissingJwtTokenException;
 import com.seungjoon.algo.utils.CookieUtil;
 import jakarta.servlet.FilterChain;
@@ -21,7 +20,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static com.seungjoon.algo.auth.jwt.JwtType.ACCESS;
-import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.exception.ExceptionCode.MISSING_JWT_TOKEN;
 
 public class JwtFilter extends OncePerRequestFilter {
 
