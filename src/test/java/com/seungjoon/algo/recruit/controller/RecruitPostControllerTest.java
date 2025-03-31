@@ -49,8 +49,7 @@ class RecruitPostControllerTest {
                 "anyTitle",
                 "anyContent",
                 2,
-                10,
-                15,
+                3,
                 2,
                 "FRIDAY",
                 2,
@@ -65,8 +64,7 @@ class RecruitPostControllerTest {
 
         //then
         actions
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, "/recruit-posts/1"));
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test

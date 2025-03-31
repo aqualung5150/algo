@@ -59,8 +59,7 @@ class RecruitPostRepositoryTest {
         /* StudyRule, RecruitPost */
         for (long i = 1; i <= 3; ++i) {
             StudyRule studyRule = StudyRule.builder()
-                    .minLevel(5 * (int)i)
-                    .maxLevel(5 * (int)i + 10)
+                    .level((int)i)
                     .totalWeek(10)
                     .submitPerWeek(3)
                     .submitDayOfWeek(DayOfWeek.FRIDAY)
@@ -140,25 +139,12 @@ class RecruitPostRepositoryTest {
 
         //when
         RecruitPostCondition minLevel = new RecruitPostCondition();
-        minLevel.setMinLevel(15);
+        minLevel.setLevel(3);
         Page<RecruitPost> minLevelPosts = recruitPostRepository
                 .findAllByCondition(minLevel, pageRequest);
 
-        RecruitPostCondition maxLevel = new RecruitPostCondition();
-        maxLevel.setMaxLevel(15);
-        Page<RecruitPost> maxLevelPosts = recruitPostRepository
-                .findAllByCondition(maxLevel, pageRequest);
-
-        RecruitPostCondition minMaxLevel = new RecruitPostCondition();
-        minMaxLevel.setMinLevel(15);
-        minMaxLevel.setMaxLevel(25);
-        Page<RecruitPost> minMaxLevelPosts = recruitPostRepository
-                .findAllByCondition(minMaxLevel, pageRequest);
-
         //then
         assertThat(minLevelPosts.getTotalElements()).isEqualTo(1);
-        assertThat(maxLevelPosts.getTotalElements()).isEqualTo(1);
-        assertThat(minMaxLevelPosts.getTotalElements()).isEqualTo(1);
     }
 
     @Test
@@ -197,8 +183,7 @@ class RecruitPostRepositoryTest {
         RecruitPostCondition condition = new RecruitPostCondition();
         condition.setTag(List.of(1L, 3L));
         condition.setTitle("post3");
-        condition.setMinLevel(15);
-        condition.setMaxLevel(25);
+        condition.setLevel(3);
 
         //when
         Page<RecruitPost> posts = recruitPostRepository
@@ -222,8 +207,6 @@ class RecruitPostRepositoryTest {
         RecruitPostCondition condition = new RecruitPostCondition();
         condition.setTag(List.of(1L, 3L));
         condition.setTitle("post");
-        condition.setMinLevel(5);
-        condition.setMaxLevel(25);
 
         //when
         Page<RecruitPost> posts = recruitPostRepository
