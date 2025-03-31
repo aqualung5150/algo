@@ -113,6 +113,25 @@ public class SubmissionService {
     }
 
     @Transactional
+    public void update(Long id, Long authId, UpdateSubmissionRequest request) {
+
+        Submission submission = submissionRepository.findById(id).orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
+
+        if (!submission.getMember().getId().equals(authId)) {
+            throw new UnauthorizedException(NOT_OWN_RESOURCE);
+        }
+
+
+        List<Tag> tags = tagRepository.findByIdIn(request.getTags());
+        validateTagsExist(request, tags);
+
+        List<SubmissionTag> submissionTags = submission.getSubmissionTags();
+        SubmissionTag.updateListFromTags(submission, submissionTags, tags);
+
+        submission.changeSubmission(request.getSubjectNumber(), request.getContent(), request.getVisibility());
+    }
+
+    @Transactional
     public Long evaluate(Long submissionId, Long evaluatorId, CreateEvaluationRequest request) {
 
         Submission submission = submissionRepository.findByIdJoinFetchStudy(submissionId).orElseThrow(() -> new BadRequestException(NOT_FOUND_SUBMISSION));
@@ -199,6 +218,12 @@ public class SubmissionService {
     }
 
     private void validateTagsExist(CreateSubmissionRequest request, List<Tag> tags) {
+        if (tags.size() != request.getTags().size()) {
+            throw new BadRequestException(INVALID_TAGS);
+        }
+    }
+
+    private void validateTagsExist(UpdateSubmissionRequest request, List<Tag> tags) {
         if (tags.size() != request.getTags().size()) {
             throw new BadRequestException(INVALID_TAGS);
         }

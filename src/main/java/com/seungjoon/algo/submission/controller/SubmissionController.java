@@ -56,6 +56,17 @@ public class SubmissionController {
         return ResponseEntity.ok(submissionService.getSubmissionById(principalDetails, id));
     }
 
+    @PutMapping("{id}")
+    public ResponseEntity<Void> update(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateSubmissionRequest request
+    ) {
+        submissionService.update(id, principalDetails.getId(), request);
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("{id}/evaluations")
     public ResponseEntity<EvaluationsResponse> getEvaluations(
             @AuthenticationPrincipal PrincipalDetails principalDetails,

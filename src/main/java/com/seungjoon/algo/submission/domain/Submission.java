@@ -8,9 +8,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +40,8 @@ public class Submission extends BaseEntity {
     @JoinColumn(name = "study_id")
     Study study;
 
-    @OneToMany(mappedBy = "submission")
-    private List<SubmissionTag> tags = new ArrayList<>();
+    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SubmissionTag> submissionTags = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private SubmissionState state = SubmissionState.PENDING;
@@ -59,10 +57,16 @@ public class Submission extends BaseEntity {
     }
 
     public void addSubmissionTags(List<SubmissionTag> submissionTags) {
-        this.tags.addAll(submissionTags);
+        this.submissionTags.addAll(submissionTags);
     }
 
     public void changeState(SubmissionState state) {
         this.state = state;
+    }
+
+    public void changeSubmission(Integer SubjectNumber, String content, String visibility) {
+        this.subjectNumber = SubjectNumber;
+        this.content = content;
+        this.visibility = SubmissionVisibility.valueOf(visibility);
     }
 }

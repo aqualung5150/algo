@@ -38,4 +38,13 @@ public class SubmissionTag extends BaseEntity {
                 .map(tag -> new SubmissionTag(submission, tag))
                 .toList();
     }
+
+    public static void updateListFromTags(Submission submission, List<SubmissionTag> submissionTags, List<Tag> tags) {
+        submissionTags.removeIf(s -> !tags.contains(s.getTag()));
+        for (Tag tag : tags) {
+            if (submissionTags.stream().noneMatch(s -> s.getTag().equals(tag))) {
+                submissionTags.add(new SubmissionTag(submission, tag));
+            }
+        }
+    }
 }
