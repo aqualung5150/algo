@@ -11,6 +11,7 @@ build:
   script:
     - mkdir -p src/main/resources
     - echo "$APP_CONFIG" > src/main/resources/application.yml
+    - cat src/main/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
