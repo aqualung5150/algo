@@ -11,9 +11,9 @@ build:
   script:
 #    - cat /etc/gitlab-runner/spring/main/application.yml || echo "NO FILE!!!"
 #    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
+    - cd /etc/gitlab-runner && ls -al
     - cat /etc/gitlab-runner/application.yml || echo "NO FILE!!!"
     - cp /etc/gitlab-runner/application.yml src/main/resources/application.yml
-    - cd /etc/gitlab-runner && ls -al
     - gradle clean build
   artifacts:
     paths:
