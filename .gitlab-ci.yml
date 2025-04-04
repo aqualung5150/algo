@@ -9,12 +9,13 @@ build:
   stage: build
   image: gradle:latest
   script:
-    - cp /etc/gitlab-runner/application.yml src/main/resources/application.yml
-#    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
+    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
       - build/libs/*.jar
+  volumes:
+    - /etc/gitlab-runner:/etc/gitlab-runner
 
 test:
   stage: test
@@ -23,3 +24,5 @@ test:
     - gradle test
   only:
     - main
+  volumes:
+    - /etc/gitlab-runner:/etc/gitlab-runner
