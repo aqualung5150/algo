@@ -14,8 +14,6 @@ build:
   artifacts:
     paths:
       - build/libs/*.jar
-  volumes:
-    - /etc/gitlab-runner:/etc/gitlab-runner
 
 test:
   stage: test
@@ -24,5 +22,3 @@ test:
     - gradle test
   only:
     - main
-  volumes:
-    - /etc/gitlab-runner:/etc/gitlab-runner
