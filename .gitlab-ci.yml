@@ -20,7 +20,7 @@ build:
 test:
   stage: test
   script:
-    - mkdir -p src/main/resources
+    - mkdir -p src/test/resources
     - echo "$TEST_CONFIG" > src/test/resources/application.yml
     - gradle test
   only:
