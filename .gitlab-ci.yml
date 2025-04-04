@@ -9,11 +9,7 @@ build:
   stage: build
   image: gradle:latest
   script:
-#    - cat /etc/gitlab-runner/spring/main/application.yml || echo "NO FILE!!!"
-#    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
-    - cd /etc/gitlab-runner && ls -al
-    - cat /etc/gitlab-runner/application.yml || echo "NO FILE!!!"
-    - cp /etc/gitlab-runner/application.yml src/main/resources/application.yml
+    - echo "$APP_CONFIG" > src/main/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
@@ -22,7 +18,7 @@ build:
 test:
   stage: test
   script:
-    - cp /etc/gitlab-runner/spring/test/application.yml src/test/resources/application.yml
+    - echo "$TEST_CONFIG" > src/test/resources/application.yml
     - gradle test
   only:
     - main
