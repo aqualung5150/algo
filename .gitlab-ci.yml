@@ -1,7 +1,23 @@
+image: gradle:latest  # Gradle이 포함된 Docker 이미지 사용
+
 stages:
+  - build
   - test
+
+before_script:
+  - echo "🏗️ Gradle 빌드 환경 설정"
+
+build:
+  stage: build
+  script:
+    - gradle clean build
+  artifacts:
+    paths:
+      - build/libs/*.jar
 
 test:
   stage: test
   script:
-    - echo "HELLO THIS IS TEST"
+    - gradle test
+  only:
+    - main
