@@ -10,6 +10,8 @@ build:
   image: gradle:latest
   script:
     - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
+    - cd /etc/gitlab-runner
+    - ls -al
     - gradle clean build
   artifacts:
     paths:
