@@ -1,5 +1,3 @@
-image: gradle:latest  # Gradle이 포함된 Docker 이미지 사용
-
 stages:
   - build
   - test
@@ -9,9 +7,10 @@ before_script:
 
 build:
   stage: build
+  image: gradle:latest
   script:
-    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
-    - cp /etc/gitlab-runner/spring/test/application.yml src/test/resources/application.yml
+    - cp /etc/gitlab-runner/application.yml src/main/resources/application.yml
+#    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
@@ -20,6 +19,7 @@ build:
 test:
   stage: test
   script:
+    - cp /etc/gitlab-runner/spring/test/application.yml src/test/resources/application.yml
     - gradle test
   only:
     - main
