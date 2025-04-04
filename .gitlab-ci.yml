@@ -4,13 +4,13 @@ stages:
 
 before_script:
   - echo "🏗️ Gradle 빌드 환경 설정"
-  - echo "$APP_CONFIG" > src/main/resources/application.yml
 
 build:
   stage: build
   image: gradle:latest
   script:
-#    - echo "$APP_CONFIG" > src/main/resources/application.yml
+    - mkdir -p src/main/resources
+    - echo "$APP_CONFIG" > src/main/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
@@ -19,6 +19,7 @@ build:
 test:
   stage: test
   script:
+    - mkdir -p src/main/resources
     - echo "$TEST_CONFIG" > src/test/resources/application.yml
     - gradle test
   only:
