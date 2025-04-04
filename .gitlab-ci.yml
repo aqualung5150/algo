@@ -4,7 +4,7 @@ stages:
 
 before_script:
   - echo "🏗️ Gradle 빌드 환경 설정"
-  - cp ${APP_CONFIG} src/main/resources/application.yml
+  - echo "$APP_CONFIG" > src/main/resources/application.yml
 
 build:
   stage: build
