@@ -10,6 +10,8 @@ before_script:
 build:
   stage: build
   script:
+    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
+    - cp /etc/gitlab-runner/spring/test/application.yml src/test/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
