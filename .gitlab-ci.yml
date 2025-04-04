@@ -9,8 +9,10 @@ build:
   stage: build
   image: gradle:latest
   script:
-    - cat /etc/gitlab-runner/spring/main/application.yml || echo "NO FILE!!!"
-    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
+#    - cat /etc/gitlab-runner/spring/main/application.yml || echo "NO FILE!!!"
+#    - cp /etc/gitlab-runner/spring/main/application.yml src/main/resources/application.yml
+    - cat /etc/gitlab-runner/application.yml || echo "NO FILE!!!"
+    - cp /etc/gitlab-runner/application.yml src/main/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
