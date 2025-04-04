@@ -4,24 +4,28 @@ stages:
 
 before_script:
   - echo "🏗️ Gradle 빌드 환경 설정"
+  - mkdir -p src/main/resources
+  - echo "$APP_CONFIG" > src/main/resources/application.yml
+  - mkdir -p src/test/resources
+  - echo "$TEST_CONFIG" > src/test/resources/application.yml
 
 build:
   stage: build
   image: gradle:8.13.0-jdk17
   script:
-    - mkdir -p src/main/resources
-    - echo "$APP_CONFIG" > src/main/resources/application.yml
-    - cat src/main/resources/application.yml
+#    - mkdir -p src/main/resources
+#    - echo "$APP_CONFIG" > src/main/resources/application.yml
+#    - cat src/main/resources/application.yml
     - gradle clean build
   artifacts:
     paths:
       - build/libs/*.jar
 
-test:
-  stage: test
-  script:
-    - mkdir -p src/test/resources
-    - echo "$TEST_CONFIG" > src/test/resources/application.yml
-    - gradle test
-  only:
-    - main
+#test:
+#  stage: test
+#  script:
+#    - mkdir -p src/test/resources
+#    - echo "$TEST_CONFIG" > src/test/resources/application.yml
+#    - gradle test
+#  only:
+#    - main
