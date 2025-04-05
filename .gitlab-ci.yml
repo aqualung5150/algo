@@ -3,6 +3,7 @@ stages:
   - test
 
 before_script:
+  - echo "TEST"
   - echo "🏗️ Gradle 빌드 환경 설정"
   - mkdir -p src/main/resources
   - echo "$APP_CONFIG" > src/main/resources/application.yml
