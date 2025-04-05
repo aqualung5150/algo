@@ -6,9 +6,11 @@ before_script:
   - echo "TEST"
   - echo "🏗️ Gradle 빌드 환경 설정"
   - mkdir -p src/main/resources
-  - echo "$APP_CONFIG" > src/main/resources/application.yml
+#  - echo "$APP_CONFIG" > src/main/resources/application.yml
   - mkdir -p src/test/resources
-  - echo "$TEST_CONFIG" > src/test/resources/application.yml
+#  - echo "$TEST_CONFIG" > src/test/resources/application.yml
+  - cp "$APP_CONFIG_FILE" src/main/resources/application.yml
+  - cp "$TEST_CONFIG_FILE" src/test/resources/application.yml
 
 build:
   stage: build
