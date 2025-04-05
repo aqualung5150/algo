@@ -13,12 +13,13 @@ before_script:
 build:
   stage: build
   image: gradle:8.13.0-jdk17
-  script:
-    - gradle clean build
   tags:
     - local
+  script:
+    - gradle clean build
   when: manual
   artifacts:
+    expire_in: 1 hour
     paths:
       - build/libs/*.jar
 
