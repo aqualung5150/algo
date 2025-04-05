@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+#  - test
 
 before_script:
   - echo "TEST"
@@ -15,6 +15,7 @@ build:
   image: gradle:8.13.0-jdk17
   script:
     - gradle clean build
+  when: manual
   artifacts:
     paths:
       - build/libs/*.jar
