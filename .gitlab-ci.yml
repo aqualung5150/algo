@@ -33,6 +33,8 @@ build:
 #  TODO
 deploy:
   stage: deploy
+  tags:
+    - local
   only:
     - master
   script:
