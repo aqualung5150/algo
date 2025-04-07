@@ -2,6 +2,11 @@ stages:
   - build
 #  - test
 
+variables:
+  IMAGE_NAME: myapi
+  DOCKER_TAG: $CI_COMMIT_SHORT_SHA
+#  SSH_OPTS: "-o StrictHostKeyChecking=no -i $EC2_SSH_KEY"
+
 before_script:
   - echo "TEST"
   - echo "🏗️ Gradle 빌드 환경 설정"
@@ -16,12 +21,14 @@ build:
   tags:
     - local
   script:
-    - gradle clean build
-  when: manual
+    - ./gradlew clean bootJar
+    - docker build -t $IMAGE_NAME:$DOCKER_TAG .
+    - docker save $IMAGE_NAME:$DOCKER_TAG -o $IMAGE_NAME.tar
   artifacts:
-    expire_in: 1 hour
     paths:
-      - build/libs/*.jar
+      - $IMAGE_NAME.tar
+    expire_in: 1 hour
+  when: manual
 
 #test:
 #  stage: test
