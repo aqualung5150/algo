@@ -21,7 +21,7 @@ build:
   tags:
     - local
   script:
-    - ./gradlew clean bootJar
+    - gradlew clean bootJar
     - docker build -t $IMAGE_NAME:$DOCKER_TAG .
     - docker save $IMAGE_NAME:$DOCKER_TAG -o $IMAGE_NAME.tar
   artifacts:
