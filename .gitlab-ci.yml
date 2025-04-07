@@ -34,7 +34,7 @@ build:
 deploy:
   stage: deploy
   only:
-    - main
+    - master
   script:
 #    - chmod 400 $EC2_SSH_KEY
     - scp $SSH_OPTS $IMAGE_NAME.tar ec2-user@$EC2_HOST:/home/ec2-user/
