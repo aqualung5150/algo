@@ -23,7 +23,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private static final String REDIRECT_URL = "redirectUrl";
 
-    @Value("${frontend.base-url}")
+    @Value("${cloudfront.base-url}")
     private String frontendBaseUrl;
     @Value("${jwt.access-expire}")
     private Long accessExpire;

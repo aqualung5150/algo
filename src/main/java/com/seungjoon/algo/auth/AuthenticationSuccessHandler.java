@@ -24,8 +24,6 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 
     private static final String REDIRECT_URL = "redirectUrl";
 
-    @Value("${frontend.base-url}")
-    private String frontendBaseUrl;
     @Value("${jwt.access-expire}")
     private Long accessExpire;
     @Value("${jwt.refresh-expire}")
