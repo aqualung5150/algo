@@ -9,11 +9,12 @@ variables:
 
 before_script:
   - echo "🏗️ Gradle 빌드 환경 설정"
-  - docker info
   - mkdir -p src/main/resources
   - mkdir -p src/test/resources
-  - cp "$APP_CONFIG_FILE" src/main/resources/application.yml
-  - cp "$TEST_CONFIG_FILE" src/test/resources/application.yml
+  - cp /etc/gitlab-runner/config/application-app.yml src/main/resources/application.yml
+  - cp /etc/gitlab-runner/config/application-test.yml src/test/resources/application.yml
+#  - cp "$APP_CONFIG_FILE" src/main/resources/application.yml
+#  - cp "$TEST_CONFIG_FILE" src/test/resources/application.yml
   - chmod +x ./gradlew
 
 build:
