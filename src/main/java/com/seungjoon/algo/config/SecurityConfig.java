@@ -39,7 +39,8 @@ public class SecurityConfig{
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors(Customizer.withDefaults()) //TEST
+//                .cors(cors -> cors.disable()) //TEST
+//                .cors(Customizer.withDefaults()) //TEST
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
