@@ -59,7 +59,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .username(signUpRequest.getUsername())
                 .role(MEMBER)
-                .imageUrl(baseUrl + "images/default.jpg")
+                .imageUrl(baseUrl + "/images/default.jpg")
                 .authType("normal")
                 .state(ACTIVE)
                 .build());
