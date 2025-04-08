@@ -1,7 +1,6 @@
 stages:
   - build
   - deploy
-#  - test
 
 variables:
   IMAGE_NAME: myapi
@@ -28,9 +27,8 @@ build:
     paths:
       - $IMAGE_NAME.tar
     expire_in: 1 hour
-  when: manual
+#  when: manual
 
-#  TODO
 deploy:
   stage: deploy
   tags:
@@ -41,13 +39,4 @@ deploy:
 #    - chmod 400 $EC2_SSH_KEY
     - scp $SSH_OPTS $IMAGE_NAME.tar ec2-user@$EC2_HOST:/home/ec2-user/
     - ssh $SSH_OPTS ec2-user@$EC2_HOST 'bash -s' < /etc/gitlab-runner/deploy.sh $IMAGE_NAME $DOCKER_TAG
-  when: manual
-
-#test:
-#  stage: test
-#  script:
-#    - mkdir -p src/test/resources
-#    - echo "$TEST_CONFIG" > src/test/resources/application.yml
-#    - gradle test
-#  only:
-#    - main
+#  when: manual
