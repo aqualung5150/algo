@@ -10,10 +10,11 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 
 import java.io.IOException;
 
+//TODO: 쿠키 삭제 안됨...
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
-    @Value("${base-url}")
-    private String baseUrl;
+//    @Value("${base-url}")
+//    private String baseUrl;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -21,7 +22,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         Cookie accessToken = new Cookie("access_token", null);
         accessToken.setPath("/");
         accessToken.setMaxAge(0);
-        accessToken.setDomain(baseUrl);
+//        accessToken.setDomain(baseUrl);
         accessToken.setSecure(true);
         accessToken.setHttpOnly(true);
         response.addCookie(accessToken);
@@ -30,7 +31,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         Cookie refreshToken = new Cookie("refresh_token", null);
         refreshToken.setPath("/");
         refreshToken.setMaxAge(0);
-        refreshToken.setDomain(baseUrl);
+//        refreshToken.setDomain(baseUrl);
         refreshToken.setSecure(true);
         refreshToken.setHttpOnly(true);
         response.addCookie(refreshToken);
