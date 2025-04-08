@@ -9,15 +9,14 @@ import com.seungjoon.algo.auth.jwt.JwtProvider;
 import com.seungjoon.algo.auth.oauth.OAuth2FailureHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2SuccessHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2UserService;
+import com.seungjoon.algo.auth.service.CustomLogoutSuccessHandler;
 import com.seungjoon.algo.member.domain.Role;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -39,8 +39,6 @@ public class SecurityConfig{
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-//                .cors(cors -> cors.disable()) //TEST
-//                .cors(Customizer.withDefaults()) //TEST
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
@@ -50,10 +48,7 @@ public class SecurityConfig{
                 .addFilterAt(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .logout(logout -> logout
-                        .deleteCookies("access_token", "refresh_token")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                        })
+                        .logoutSuccessHandler(logoutSuccessHandler())
                 )
 
                 .oauth2Login(oauth2 -> oauth2
@@ -128,5 +123,10 @@ public class SecurityConfig{
         jsonAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
         jsonAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
         return jsonAuthenticationFilter;
+    }
+
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return new CustomLogoutSuccessHandler();
     }
 }
