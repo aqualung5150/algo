@@ -39,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // redirectUrl 쿠키 삭제
         Cookie cookie = new Cookie(REDIRECT_URL, null);
         //TODO: setDomain?
-        cookie.setDomain(".rockaria.store");
+        cookie.setDomain("rockaria.store");
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
