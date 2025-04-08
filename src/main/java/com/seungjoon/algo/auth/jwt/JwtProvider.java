@@ -74,7 +74,7 @@ public class JwtProvider {
     //TODO: setSecure
     public Cookie createJwtCookie(String key, String token) {
         Cookie cookie = new Cookie(key, token);
-//        cookie.setDomain("localhost");
+        cookie.setDomain("algo.rockaria.store");
         cookie.setPath("/");
         cookie.setHttpOnly(true);
 //        cookie.setMaxAge(10 * 60);
