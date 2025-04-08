@@ -39,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // redirectUrl 쿠키 삭제
         Cookie cookie = new Cookie(REDIRECT_URL, null);
         //TODO: setDomain?
-        cookie.setDomain("localhost");
+//        cookie.setDomain("localhost");
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
