@@ -24,6 +24,8 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 
     private static final String REDIRECT_URL = "redirectUrl";
 
+    @Value("${root-domain}")
+    private String rootDomain;
     @Value("${jwt.access-expire}")
     private Long accessExpire;
     @Value("${jwt.refresh-expire}")
@@ -37,8 +39,7 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 
         // redirectUrl 쿠키 삭제
         Cookie cookie = new Cookie(REDIRECT_URL, null);
-        //TODO: setDomain?
-        cookie.setDomain("localhost");
+        cookie.setDomain(rootDomain);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);

@@ -23,6 +23,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private static final String REDIRECT_URL = "redirectUrl";
 
+    @Value("${root-domain}")
+    private String rootDomain;
     @Value("${cloudfront.base-url}")
     private String frontendBaseUrl;
     @Value("${jwt.access-expire}")
@@ -38,8 +40,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // redirectUrl 쿠키 삭제
         Cookie cookie = new Cookie(REDIRECT_URL, null);
-        //TODO: setDomain?
-        cookie.setDomain("rockaria.store");
+        cookie.setDomain(rootDomain);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
