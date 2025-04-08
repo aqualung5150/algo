@@ -63,7 +63,7 @@ public class S3Service implements ImageService {
                 ObjectMetadata.builder().contentType(multipartFile.getContentType()).build()
         );
 
-        return baseUrl + "images/" + storeFilename;
+        return baseUrl + "/images/" + storeFilename;
     }
 
     private String createStoreFilename(MultipartFile multipartFile) {
