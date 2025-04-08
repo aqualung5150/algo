@@ -9,7 +9,7 @@ import com.seungjoon.algo.auth.jwt.JwtProvider;
 import com.seungjoon.algo.auth.oauth.OAuth2FailureHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2SuccessHandler;
 import com.seungjoon.algo.auth.oauth.OAuth2UserService;
-import com.seungjoon.algo.auth.service.CustomLogoutSuccessHandler;
+import com.seungjoon.algo.auth.CustomLogoutSuccessHandler;
 import com.seungjoon.algo.member.domain.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
