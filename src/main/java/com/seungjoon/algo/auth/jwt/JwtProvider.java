@@ -78,7 +78,7 @@ public class JwtProvider {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
 //        cookie.setMaxAge(10 * 60);
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
 
         return cookie;
     }
