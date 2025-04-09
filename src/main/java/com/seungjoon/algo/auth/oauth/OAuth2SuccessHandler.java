@@ -43,6 +43,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         cookie.setDomain(rootDomain);
         cookie.setPath("/");
         cookie.setMaxAge(0);
+        cookie.setSecure(true);
         response.addCookie(cookie);
 
         PrincipalDetails userDetails = (PrincipalDetails) authentication.getPrincipal();

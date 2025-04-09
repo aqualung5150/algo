@@ -42,6 +42,7 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
         cookie.setDomain(rootDomain);
         cookie.setPath("/");
         cookie.setMaxAge(0);
+        cookie.setSecure(true);
         response.addCookie(cookie);
 
         PrincipalDetails userDetails = (PrincipalDetails) authentication.getPrincipal();
