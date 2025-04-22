@@ -283,9 +283,10 @@ public class RecruitPostService {
         while (matcher.find()) {
             String url = matcher.group(1);
 
-            //for local
-            String[] split = url.split("\\\\");
-//            String[] split = url.split("/");
+            //Windows backslash path
+//            String[] split = url.split("\\\\");
+
+            String[] split = url.split("/");
             result.add(split[split.length - 1]);
         }
         return result;
