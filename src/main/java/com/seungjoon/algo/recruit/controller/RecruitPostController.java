@@ -61,6 +61,16 @@ public class RecruitPostController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteRecruitPost(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long id
+    ) {
+        recruitPostService.deleteRecruitPost(principalDetails.getId(), id);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @RequestMapping(value = "{postId}/applicants/{memberId}", method = HEAD)
     public ResponseEntity<Void> existsApplicant(
             @PathVariable Long postId,
@@ -94,16 +104,6 @@ public class RecruitPostController {
             @PathVariable Long postId
     ) {
         recruitPostService.deleteApplicant(postId, principalDetails.getId());
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteRecruitPost(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable Long id
-    ) {
-        recruitPostService.deleteRecruitPost(principalDetails.getId(), id);
 
         return ResponseEntity.noContent().build();
     }

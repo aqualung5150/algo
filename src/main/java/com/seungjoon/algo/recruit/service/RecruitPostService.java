@@ -2,6 +2,8 @@ package com.seungjoon.algo.recruit.service;
 
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.UnauthorizedException;
+import com.seungjoon.algo.image.domain.Image;
+import com.seungjoon.algo.image.repository.ImageRepository;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.dto.ProfileResponse;
 import com.seungjoon.algo.member.repository.MemberRepository;
@@ -24,9 +26,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.image.domain.ImageType.*;
 import static com.seungjoon.algo.recruit.domain.RecruitPostState.RECRUITING;
 
 @Service
@@ -39,6 +46,7 @@ public class RecruitPostService {
     private final StudyRuleRepository studyRuleRepository;
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
+    private final ImageRepository imageRepository;
 
     @Transactional
     public Long createRecruitPost(Long authId, CreateRecruitPostRequest request) {
@@ -69,7 +77,95 @@ public class RecruitPostService {
                 .build()
         );
 
+        // Update Image Type
+        Set<String> imageIds = extractImageIds(saved.getContent());
+        List<Image> images = imageRepository.findAllById(imageIds);
+        images.forEach(image -> {
+            image.changeType(RECRUIT_POST);
+            image.changeRecruitPost(saved);
+        });
+
         return saved.getId();
+    }
+
+    @Transactional
+    public void updateRecruitPost(Long postId, Long authId, CreateRecruitPostRequest request) {
+
+        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+
+        if (!post.getMember().getId().equals(authId)) {
+            throw new UnauthorizedException(NOT_OWN_RESOURCE);
+        }
+
+        if (post.getState() == RecruitPostState.COMPLETED) {
+            throw new BadRequestException(RECRUITMENT_FINISHED);
+        }
+
+        List<Tag> tags = tagRepository.findByIdIn(request.getTags());
+        validateTagsExist(request, tags);
+
+        StudyRule studyRule = post.getStudyRule();
+        studyRule.changeStudyRule(
+                request.getNumberOfMembers(),
+                request.getLevel(),
+                request.getTotalWeek(),
+                DayOfWeek.valueOf(request.getSubmitDayOfWeek()),
+                request.getSubmitPerWeek()
+        );
+
+        List<StudyRuleTag> studyRuleTags = studyRule.getStudyRuleTags();
+        StudyRuleTag.updateListFromTags(studyRule, studyRuleTags, tags);
+
+        post.changeRecruitPost(request.getTitle(), request.getContent());
+
+        //Update Images
+        Set<String> curImages = extractImageIds(post.getContent());
+        List<Image> prevImages = imageRepository.findAllByRecruitPost(post);
+        //Deleted Unused Images
+        prevImages.stream().filter(image -> !curImages.contains(image.getId())).forEach(image -> {
+            image.changeType(TEMPORARY);
+            image.changeRecruitPost(null);
+        });
+        //Newly Added Images
+        List<Image> images = imageRepository.findAllById(curImages);
+        images.forEach(image -> {
+            image.changeType(RECRUIT_POST);
+            image.changeRecruitPost(post);
+        });
+    }
+
+    @Transactional
+    public void deleteRecruitPost(Long authId, Long postId) {
+
+        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
+
+        if (!post.getMember().getId().equals(authId)) {
+            throw new UnauthorizedException(NOT_OWN_RESOURCE);
+        }
+
+        // Applicant 삭제
+        /* 벌크 연산 - clearAutomatically, flushAutomatically 등 옵션이 필요할 수 있음 */
+        applicantRepository.deleteAllByRecruitPostId(post.getId());
+
+        // RecruitPost 삭제
+        recruitPostRepository.deleteById(post.getId());
+
+        // StudyRule 삭제
+        //TODO: srt도 단건쿼리가 여러번 나감
+        //-> @OnDelete로 해결 -> 적절한지 확인이 필요함
+        if (post.getState() == RECRUITING) {
+            studyRuleRepository.deleteById(post.getStudyRule().getId());
+        }
+
+        //Delete All Images
+        Set<String> imageIds = extractImageIds(post.getContent());
+        List<Image> images = imageRepository.findAllById(imageIds);
+        images.forEach(image -> {
+            image.changeType(TEMPORARY);
+            image.changeRecruitPost(null);
+        });
     }
 
     @Transactional
@@ -158,63 +254,6 @@ public class RecruitPostService {
         );
     }
 
-    @Transactional
-    public void updateRecruitPost(Long postId, Long authId, CreateRecruitPostRequest request) {
-
-        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId)
-                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
-
-        if (!post.getMember().getId().equals(authId)) {
-            throw new UnauthorizedException(NOT_OWN_RESOURCE);
-        }
-
-        if (post.getState() == RecruitPostState.COMPLETED) {
-            throw new BadRequestException(RECRUITMENT_FINISHED);
-        }
-
-        List<Tag> tags = tagRepository.findByIdIn(request.getTags());
-        validateTagsExist(request, tags);
-
-        StudyRule studyRule = post.getStudyRule();
-        studyRule.changeStudyRule(
-                request.getNumberOfMembers(),
-                request.getLevel(),
-                request.getTotalWeek(),
-                DayOfWeek.valueOf(request.getSubmitDayOfWeek()),
-                request.getSubmitPerWeek()
-        );
-
-        List<StudyRuleTag> studyRuleTags = studyRule.getStudyRuleTags();
-        StudyRuleTag.updateListFromTags(studyRule, studyRuleTags, tags);
-
-        post.changeRecruitPost(request.getTitle(), request.getContent());
-    }
-
-    @Transactional
-    public void deleteRecruitPost(Long authId, Long postId) {
-
-        RecruitPost post = recruitPostRepository.findByIdJoinFetch(postId)
-                .orElseThrow(() -> new BadRequestException(NOT_FOUND_POST));
-
-        if (!post.getMember().getId().equals(authId)) {
-            throw new UnauthorizedException(NOT_OWN_RESOURCE);
-        }
-
-        // Applicant 삭제
-        /* 벌크 연산 - clearAutomatically, flushAutomatically 등 옵션이 필요할 수 있음 */
-        applicantRepository.deleteAllByRecruitPostId(post.getId());
-
-        // RecruitPost 삭제
-        recruitPostRepository.deleteById(post.getId());
-
-        // StudyRule 삭제
-        //TODO: srt도 단건쿼리가 여러번 나감
-        //-> @OnDelete로 해결 -> 적절한지 확인이 필요함
-        if (post.getState() == RECRUITING) {
-            studyRuleRepository.deleteById(post.getStudyRule().getId());
-        }
-    }
-
     private void validateApplicant(RecruitPost post, Member member) {
 
         if (post.getState() == RecruitPostState.COMPLETED) {
@@ -234,5 +273,21 @@ public class RecruitPostService {
         if (tags.size() != request.getTags().size()) {
             throw new BadRequestException(INVALID_TAGS);
         }
+    }
+
+    private Set<String> extractImageIds(String markdownContent) {
+        Pattern pattern = Pattern.compile("!\\[.*?\\]\\((.*?)\\)");
+        Matcher matcher = pattern.matcher(markdownContent);
+
+        Set<String> result = new HashSet<>();
+        while (matcher.find()) {
+            String url = matcher.group(1);
+
+            //for local
+            String[] split = url.split("\\\\");
+//            String[] split = url.split("/");
+            result.add(split[split.length - 1]);
+        }
+        return result;
     }
 }

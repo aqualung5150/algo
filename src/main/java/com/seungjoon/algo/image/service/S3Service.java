@@ -1,12 +1,15 @@
 package com.seungjoon.algo.image.service;
 
+import com.seungjoon.algo.image.domain.Image;
 import com.seungjoon.algo.image.dto.DeleteRequest;
 import com.seungjoon.algo.image.dto.ImagesResponse;
+import com.seungjoon.algo.image.repository.ImageRepository;
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Template;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class S3Service implements ImageService {
 
     @Value("${spring.cloud.aws.s3.bucket}")
@@ -24,6 +28,8 @@ public class S3Service implements ImageService {
 
     @Value("${cloudfront.base-url}")
     private String baseUrl;
+
+    private final ImageRepository imageRepository;
 
     @Override
     public ImagesResponse upload(List<MultipartFile> multipartFiles) throws IOException {
@@ -63,7 +69,12 @@ public class S3Service implements ImageService {
                 ObjectMetadata.builder().contentType(multipartFile.getContentType()).build()
         );
 
-        return baseUrl + "/images/" + storeFilename;
+        String path = baseUrl + "/images/" + storeFilename;
+
+        //DB 저장
+        imageRepository.save(new Image(storeFilename));
+
+        return path;
     }
 
     private String createStoreFilename(MultipartFile multipartFile) {
