@@ -21,12 +21,9 @@ public class ImageCleanupScheduler {
     private String bucket;
     private final S3Template s3Template;
 
-
     private final ImageRepository imageRepository;
 
-    //TEST
-    @Scheduled(cron = "0 * * * * *")
-//    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "0 0 1 * * *")
     @Transactional
     public void cleanImages() {
         List<Image> unusedImages = imageRepository.findAllByType(TEMPORARY);
