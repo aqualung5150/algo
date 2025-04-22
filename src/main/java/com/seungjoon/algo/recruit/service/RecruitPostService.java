@@ -4,6 +4,7 @@ import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.UnauthorizedException;
 import com.seungjoon.algo.image.domain.Image;
 import com.seungjoon.algo.image.repository.ImageRepository;
+import com.seungjoon.algo.image.util.ImageUtil;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.dto.ProfileResponse;
 import com.seungjoon.algo.member.repository.MemberRepository;
@@ -26,14 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
-import static com.seungjoon.algo.image.domain.ImageType.*;
+import static com.seungjoon.algo.image.domain.ImageType.RECRUIT_POST;
+import static com.seungjoon.algo.image.domain.ImageType.TEMPORARY;
 import static com.seungjoon.algo.recruit.domain.RecruitPostState.RECRUITING;
 
 @Service
@@ -78,7 +77,7 @@ public class RecruitPostService {
         );
 
         // Update Image Type
-        Set<String> imageIds = extractImageIds(saved.getContent());
+        Set<String> imageIds = ImageUtil.extractImageIdsFromMarkdown(saved.getContent());
         List<Image> images = imageRepository.findAllById(imageIds);
         images.forEach(image -> {
             image.changeType(RECRUIT_POST);
@@ -120,7 +119,7 @@ public class RecruitPostService {
         post.changeRecruitPost(request.getTitle(), request.getContent());
 
         //Update Images
-        Set<String> curImages = extractImageIds(post.getContent());
+        Set<String> curImages = ImageUtil.extractImageIdsFromMarkdown(post.getContent());
         List<Image> prevImages = imageRepository.findAllByRecruitPost(post);
         //Deleted Unused Images
         prevImages.stream().filter(image -> !curImages.contains(image.getId())).forEach(image -> {
@@ -160,7 +159,7 @@ public class RecruitPostService {
         }
 
         //Delete All Images
-        Set<String> imageIds = extractImageIds(post.getContent());
+        Set<String> imageIds = ImageUtil.extractImageIdsFromMarkdown(post.getContent());
         List<Image> images = imageRepository.findAllById(imageIds);
         images.forEach(image -> {
             image.changeType(TEMPORARY);
@@ -273,22 +272,5 @@ public class RecruitPostService {
         if (tags.size() != request.getTags().size()) {
             throw new BadRequestException(INVALID_TAGS);
         }
-    }
-
-    private Set<String> extractImageIds(String markdownContent) {
-        Pattern pattern = Pattern.compile("!\\[.*?\\]\\((.*?)\\)");
-        Matcher matcher = pattern.matcher(markdownContent);
-
-        Set<String> result = new HashSet<>();
-        while (matcher.find()) {
-            String url = matcher.group(1);
-
-            //Windows backslash path
-//            String[] split = url.split("\\\\");
-
-            String[] split = url.split("/");
-            result.add(split[split.length - 1]);
-        }
-        return result;
     }
 }
