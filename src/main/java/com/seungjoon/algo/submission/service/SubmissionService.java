@@ -3,6 +3,9 @@ package com.seungjoon.algo.submission.service;
 import com.seungjoon.algo.auth.PrincipalDetails;
 import com.seungjoon.algo.exception.BadRequestException;
 import com.seungjoon.algo.exception.UnauthorizedException;
+import com.seungjoon.algo.image.domain.Image;
+import com.seungjoon.algo.image.repository.ImageRepository;
+import com.seungjoon.algo.image.util.ImageUtil;
 import com.seungjoon.algo.member.domain.Member;
 import com.seungjoon.algo.member.repository.MemberRepository;
 import com.seungjoon.algo.study.domain.Study;
@@ -26,8 +29,10 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.seungjoon.algo.exception.ExceptionCode.*;
+import static com.seungjoon.algo.image.domain.ImageType.*;
 import static com.seungjoon.algo.study.domain.StudyMemberState.BANNED;
 import static com.seungjoon.algo.study.domain.StudyState.IN_PROGRESS;
 import static com.seungjoon.algo.submission.domain.SubmissionState.*;
@@ -43,6 +48,7 @@ public class SubmissionService {
     private final MemberRepository memberRepository;
     private final TagRepository tagRepository;
     private final EvaluationRepository evaluationRepository;
+    private final ImageRepository imageRepository;
 
     public SubmissionResponse getSubmissionById(PrincipalDetails auth, Long id) {
 
@@ -109,6 +115,14 @@ public class SubmissionService {
         //TODO: oneToMany를 배치인서트할 지 고민이 된다...
         submission.addSubmissionTags(submissionTags);
 
+        // Update Image Type
+        Set<String> imageIds = ImageUtil.extractImageIdsFromMarkdown(submission.getContent());
+        List<Image> images = imageRepository.findAllById(imageIds);
+        images.forEach(image -> {
+            image.changeType(SUBMISSION);
+            image.changeSubmission(submission);
+        });
+
         return submission.getId();
     }
 
@@ -129,6 +143,21 @@ public class SubmissionService {
         SubmissionTag.updateListFromTags(submission, submissionTags, tags);
 
         submission.changeSubmission(request.getSubjectNumber(), request.getContent(), request.getVisibility());
+
+        //Update Images
+        Set<String> curImages = ImageUtil.extractImageIdsFromMarkdown(submission.getContent());
+        List<Image> prevImages = imageRepository.findAllBySubmission(submission);
+        //Deleted Unused Images
+        prevImages.stream().filter(image -> !curImages.contains(image.getId())).forEach(image -> {
+            image.changeType(TEMPORARY);
+            image.changeRecruitPost(null);
+        });
+        //Newly Added Images
+        List<Image> images = imageRepository.findAllById(curImages);
+        images.forEach(image -> {
+            image.changeType(SUBMISSION);
+            image.changeSubmission(submission);
+        });
     }
 
     @Transactional

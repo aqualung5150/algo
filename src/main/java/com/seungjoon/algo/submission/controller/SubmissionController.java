@@ -22,15 +22,6 @@ public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    @PostMapping
-    public ResponseEntity<Map<String, Long>> submit(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @Valid @RequestBody CreateSubmissionRequest request
-    ) {
-        Long id = submissionService.submit(principalDetails.getId(), request);
-        return ResponseEntity.ok(Map.of("id", id));
-    }
-
     @GetMapping
     public ResponseEntity<SubmissionPageResponse> getSubmissions(
             @ModelAttribute SubmissionCondition condition,
@@ -54,6 +45,15 @@ public class SubmissionController {
     ) {
 
         return ResponseEntity.ok(submissionService.getSubmissionById(principalDetails, id));
+    }
+
+    @PostMapping
+    public ResponseEntity<Map<String, Long>> submit(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody CreateSubmissionRequest request
+    ) {
+        Long id = submissionService.submit(principalDetails.getId(), request);
+        return ResponseEntity.ok(Map.of("id", id));
     }
 
     @PutMapping("{id}")
